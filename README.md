@@ -6,8 +6,7 @@
 junah.blue/
 ├── client/          # React frontend application
 ├── backend/         # Express.js backend API
-├── docker-compose.yml
-└── README.md
+└── docker-compose.yml
 ```
 
 ## Prerequisites

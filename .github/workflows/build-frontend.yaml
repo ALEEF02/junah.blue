@@ -1,0 +1,18 @@
+name: Test Frontend Build
+
+on:
+  pull_request:
+    branches:
+      - main
+      - skeleton
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v4
+        - name: 
+          working-directory: client
+          run: |
+            npm ci
+            npm run build

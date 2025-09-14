@@ -1,0 +1,29 @@
+[
+  {
+    "_id": "c1",
+    "title": "Chill Vibes",
+    "description": "Smooth and mellow beat for laid‑back tracks.",
+    "previewUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    "fullUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    "price": 50,
+    "isAvailable": true
+  },
+  {
+    "_id": "t1",
+    "title": "Dark Trap",
+    "description": "Aggressive trap beat with heavy bass and crisp hi‑hats.",
+    "previewUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    "fullUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    "price": 60,
+    "isAvailable": true
+  },
+  {
+    "_id": "j1",
+    "title": "Jazzy Soul",
+    "description": "Soulful jazz‑inspired beat with warm chords and live instrumentation.",
+    "previewUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+    "fullUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+    "price": 70,
+    "isAvailable": true
+  }
+]

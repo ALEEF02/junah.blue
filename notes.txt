@@ -20,3 +20,57 @@ Websites for front-end look
 	
 8/23/25
 Music, Apparrel, Bio
+
+
+You are an expert Software Developer working with me, a beginner with a Bachelors of Engineering in Software Engineer. I am looking to build a website capable of handling payments and contracts for only one artist named Junah in the music industry selling beats. Currently in the music industry sites like DistroKid manage the transaction between a content creator looking to purchase/license a beat and the artist that makes it. This new site should operate that internally – beats should be available for purchase, with a TOS/collaboration contract relinquishing legal responsibilities of the beat.
+
+I own the domain junah.blue to deploy the website to. I am willing to support a back-end. Where possible, pick off the shelf such as Printify and Stripe tools that will support the website's operations. Consider the following tech stack:
+Frontend:
+- React with typescript, tailwind
+- Could use Framer Motion + Headless UI as component libraries to help with animations and whatnot
+Backend:
+- Node.js with Express
+- Mongodb as primary db storage
+- AWS S3 for file storage
+- Stripe for payment processing
+- Printify API for apparel stuff 
+Possible db schema: 
+- Beats collection: 
+	{
+		_id: uuid
+		title: String
+		description: String
+		previewUrl: String
+		fullUrl: String
+		isAvailable: boolean
+	}
+
+
+I am looking to base the look and feel of the website on a swatch of other sites, picking and choosing different components. Please mash up the following websites for inspiration when designing the front end: 
+- The general look from https://liveabout.com
+- The buttons and animations (specifically the "get started now" button) from https://buffer.com
+- The cleanness and animations from https://hebakadry.com/delivery
+- How products are displayed on https://homer.com
+- The sleekness of https://ableton.com
+
+Please create the Homepage for me now, not leaving any stub code. Leave the website with no example/filler content, employing real calls to fetch the real information. Do not go overboard with the quantity of code. Use reusable components for things like the NavBar to save on repetitive code. We will build the pages one by one. At the end there will be, at minimum, the following pages:
+- Homepage with a stand-in loremipsm biography of Junah
+- Apparel page for viewing and buying clothing using Printify
+- Beat Marketplace where Junah's beats can be browsed and purchased
+- Producer Dashboard where Junah can see all of his information
+- Legal Resource Center / Licensing Hub where more information about how the licensing works.
+
+Full requirements of the project:
+The buyer shall be able to preview the beat
+The buyer shall be able to view the exclusive and non-exclusive contract agreements
+The buyer shall be able to view a summary/tldr of both contracts 
+The buyer must sign the contract before purchase
+The buyer shall receive the WAVE file via email
+The seller shall receive copies of all signed agreements via email
+The seller shall be able to upload new beats
+The seller shall be able to specify a beat for selling or contractual splitting
+The seller shall be able to specify a price for the beat
+The buyer should be able to understand the splitting contract
+The system shall display a summary of the splitting contract to the buyer
+The buyer shall be able to view apparel so that they can purchase them
+The user shall be able to view a biography for Junah

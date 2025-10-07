@@ -3,6 +3,19 @@ import NavBar from '../components/NavBar';
 import BeatCard from '../components/BeatCard';
 import { getBiography, getBeats } from '../api';
 
+export interface Beat {
+  _id: string;
+  title: string;
+  description?: string;
+  previewUrl: string;
+  fullUrl?: string;
+  price: number;
+  isAvailable: boolean;
+  artworkUrl?: string;
+}
+
+type Bio = { biography: string };
+
 /**
  * The landing page for the Junah site. It fetches real data from the backend
  * and lays out multiple sections: hero, biography, featured beats, a brief
@@ -10,10 +23,10 @@ import { getBiography, getBeats } from '../api';
  * gracefully to different screen sizes.
  */
 const HomePage = () => {
-  const [bio, setBio] = useState(null);
-  const [beats, setBeats] = useState([]);
-  const [loadingBio, setLoadingBio] = useState(true);
+  const [beats, setBeats] = useState<Beat[]>([]);
+  const [bio, setBio] = useState<Bio | null>(null);
   const [loadingBeats, setLoadingBeats] = useState(true);
+  const [loadingBio, setLoadingBio] = useState(true);
 
   useEffect(() => {
     // Fetch biography from the backend

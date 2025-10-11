@@ -49,7 +49,7 @@ const BeatCard: React.FC<BeatCardProps> = ({ beat }) => {
             aria-disabled={!beat.isAvailable}
             className={`px-3 py-1.5 rounded-md text-sm font-medium transition
               ${beat.isAvailable
-                ? 'bg-black text-white hover:bg-gray-900'
+                ? 'bg-black text-white visited:text-white hover:bg-gray-900'
                 : 'pointer-events-none opacity-50 bg-gray-200 text-gray-600'}`}
             title={beat.isAvailable ? 'Buy Now' : 'Not available'}
           >

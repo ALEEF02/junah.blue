@@ -74,3 +74,5 @@ The buyer should be able to understand the splitting contract
 The system shall display a summary of the splitting contract to the buyer
 The buyer shall be able to view apparel so that they can purchase them
 The user shall be able to view a biography for Junah
+
+"Professionally casual"

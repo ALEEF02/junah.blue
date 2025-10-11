@@ -117,7 +117,7 @@ const HomePage = () => {
             exclusive and non-exclusive options with clear terms so you know exactly what you’re getting.
           </p>
           <div className="mt-6">
-            <a href="/legal" className="inline-block px-5 py-2.5 rounded-md bg-black text-white hover:bg-gray-900">Learn More</a>
+            <a href="/legal" className="inline-block px-5 py-2.5 rounded-md bg-black text-white visited:text-white hover:bg-gray-900">Learn More</a>
           </div>
         </div>
       </section>
@@ -137,4 +137,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-

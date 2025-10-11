@@ -12,4 +12,21 @@ if (!supabaseUrl || !supabaseKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
+export const testConnection = async () => {
+    try {
+        const { error } = await supabase
+            .from('test')
+            .select('count')
+            .limit(1);
+
+        if (error) {
+            console.log('Supabase connection test - table may not exist yet:', error.message);
+        } else {
+            console.log('Connected to Supabase successfully');
+        }
+    } catch (err) {
+        console.error('Supabase connection error:', err.message);
+    }
+};
+
 export default supabase;

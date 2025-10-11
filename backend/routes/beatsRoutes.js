@@ -1,26 +1,12 @@
 import { Router } from "express";
 const router = Router();
-import multer from "multer";
 import {
     downloadBeatFile,
     getBeatFileUrl,
     listBeatFiles
 } from "../services/supabaseService.js";
 
-const storage = multer.memoryStorage();
-const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 50 * 1024 * 1024, // 50MB limit
-    },
-    fileFilter: (_req, file, cb) => {
-        if (file.mimetype === 'audio/wav' || file.originalname.endsWith('.wav')) {
-            cb(null, true);
-        } else {
-            cb(new Error('Only .wav files are allowed'));
-        }
-    }
-});
+
 
 // GET /beats/file/:fileName - Retrieve a specific file from storage
 router.get('/file/:fileName', async (req, res) => {

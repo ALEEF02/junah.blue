@@ -1,6 +1,6 @@
 import { supabase } from "../dbConfig/supabase.js";
 
-const BUCKET_NAME = 'beat-files';
+const BUCKET_NAME = 'beat-files-preview';
 
 
 

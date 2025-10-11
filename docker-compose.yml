@@ -1,28 +1,6 @@
 version: '3.8'
 
 services:
-  # MongoDB Database
-  mongodb:
-    image: mongo:7.0
-    container_name: junah-mongodb-dev
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password123
-      MONGO_INITDB_DATABASE: junah_beats_dev
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_dev_data:/data/db
-    networks:
-      - junah-dev-network
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # Backend API (Development)
   backend:
     build:
       context: ./backend
@@ -32,19 +10,16 @@ services:
     environment:
       NODE_ENV: development
       PORT: 5000
-      MONGODB_URI: mongodb://admin:password123@mongodb:27017/junah_beats_dev?authSource=admin
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
     ports:
       - "5000:5000"
-    depends_on:
-      mongodb:
-        condition: service_healthy
     volumes:
       - ./backend:/app
       - backend_node_modules:/app/node_modules
     networks:
       - junah-dev-network
 
-  # Frontend React App (Development)
   frontend:
     build:
       context: ./client
@@ -73,8 +48,6 @@ services:
     tty: true
 
 volumes:
-  mongodb_dev_data:
-    driver: local
   backend_node_modules:
     driver: local
   frontend_node_modules:

@@ -4,10 +4,31 @@
 
 /* Custom global styles */
 body {
-  @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+  @apply bg-white text-gray-900;
 }
 
 /* Smooth scroll for anchor links */
 html {
   scroll-behavior: smooth;
+}
+
+/* Editorial link styling inspired by liveabout.com */
+a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+a:hover {
+  text-decoration-line: underline;
+}
+a:visited {
+  color: rgba(0, 0, 0, 0.95);
+}
+a:focus-visible {
+  outline: 3px solid #014ecb;
+  outline-offset: 1px;
+}
+
+/* Headings: slightly tighter tracking and firm weight */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.01em;
 }

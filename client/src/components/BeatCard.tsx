@@ -8,6 +8,7 @@ export interface Beat {
   fullUrl?: string;
   price: number;         // dollars
   isAvailable: boolean;
+  artworkUrl?: string;
 }
 
 interface BeatCardProps {
@@ -19,35 +20,37 @@ const formatUSD = (amount: number) =>
 
 const BeatCard: React.FC<BeatCardProps> = ({ beat }) => {
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm transition-transform hover:shadow-md hover:-translate-y-1">
-      <div className="p-5">
-        <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden transition-shadow hover:shadow-md">
+      {/* Media/Artwork area */}
+      <div className="relative w-full aspect-[16/9] bg-gray-100">
+        {beat.artworkUrl ? (
+          <img src={beat.artworkUrl} alt="Beat artwork"
+               className="absolute inset-0 w-full h-full object-cover" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">No artwork</div>
+        )}
+      </div>
+      <div className="p-4">
+        <h3 className="text-lg font-semibold text-gray-900">
           {beat.title}
         </h3>
-
         {beat.description && (
-          <p className="mt-2 text-gray-600 dark:text-gray-400 text-sm">
+          <p className="mt-1 text-gray-600 text-sm line-clamp-2">
             {beat.description}
           </p>
         )}
-
-        <audio controls preload="metadata" className="w-full mt-4" src={beat.previewUrl}>
+        <audio controls preload="metadata" className="w-full mt-3" src={beat.previewUrl}>
           Your browser does not support the audio element.
         </audio>
-
-        <div className="mt-4 flex justify-between items-center">
-          <span className="text-primary-dark dark:text-primary-light font-bold text-lg">
-            {formatUSD(beat.price)}
-          </span>
-
-          {/* Link to marketplace/detail page */}
+        <div className="mt-4 flex items-center justify-between">
+          <span className="text-gray-900 font-semibold">{formatUSD(beat.price)}</span>
           <a
             href={`/beats/${beat._id}`}
             aria-disabled={!beat.isAvailable}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition
+            className={`px-3 py-1.5 rounded-md text-sm font-medium transition
               ${beat.isAvailable
-                ? 'bg-primary-dark dark:bg-primary-light text-white dark:text-gray-900 hover:bg-primary-light hover:text-gray-900 dark:hover:bg-primary-dark dark:hover:text-white'
-                : 'pointer-events-none opacity-50 bg-gray-300 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}
+                ? 'bg-black text-white hover:bg-gray-900'
+                : 'pointer-events-none opacity-50 bg-gray-200 text-gray-600'}`}
             title={beat.isAvailable ? 'Buy Now' : 'Not available'}
           >
             {beat.isAvailable ? 'Buy Now' : 'Unavailable'}

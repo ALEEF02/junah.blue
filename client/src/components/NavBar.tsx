@@ -21,22 +21,22 @@ const NavBar = () => {
   ];
 
   return (
-    <nav className="bg-white/70 backdrop-blur dark:bg-gray-900/70 sticky top-0 z-50 shadow-sm">
+    <nav className="bg-white sticky top-0 z-50 border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
-            <a href="/" className="text-2xl font-extrabold text-primary-dark dark:text-primary-light">
-              Junah<span className="text-primary-light dark:text-primary-dark">.blue</span>
+            <a href="/" className="text-2xl font-extrabold text-black">
+              Junah<span className="text-gray-600">.blue</span>
             </a>
           </div>
           {/* Desktop menu */}
-          <div className="hidden md:flex space-x-8">
+          <div className="hidden md:flex space-x-6">
             {menuItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                className="text-gray-700 dark:text-gray-200 hover:text-primary-dark dark:hover:text-primary-light transition font-medium"
+                className="text-gray-900 text-sm uppercase tracking-wide hover:underline"
               >
                 {item.label}
               </a>
@@ -47,7 +47,7 @@ const NavBar = () => {
             <button
               type="button"
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-200 hover:text-primary-dark dark:hover:text-primary-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-900 hover:text-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[color:var(--tw-focus-ring,#014ecb)]"
             >
               {/* Simple hamburger icon */}
               <svg
@@ -79,12 +79,12 @@ const NavBar = () => {
       </div>
       {/* Mobile menu items */}
       {open && (
-        <div className="md:hidden bg-white dark:bg-gray-900 px-2 pt-2 pb-3 space-y-1 shadow-md">
+        <div className="md:hidden bg-white px-2 pt-2 pb-3 space-y-1 border-b border-gray-200">
           {menuItems.map((item) => (
             <a
               key={item.label}
               href={item.href}
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="block px-3 py-2 rounded-md text-sm uppercase tracking-wide text-gray-900 hover:bg-gray-50"
               onClick={() => setOpen(false)}
             >
               {item.label}

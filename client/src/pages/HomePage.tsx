@@ -42,7 +42,7 @@ const HomePage = () => {
       <NavBar />
 
       {/* Top intro section */}
-      <header className="bg-white">
+      <header className="bg-redundertone">
         <div className="max-w-7xl mx-auto px-6 py-10">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-black">Fresh Beats and Apparel</h1>
           <p className="mt-3 text-lg text-gray-700 max-w-2xl">
@@ -52,22 +52,22 @@ const HomePage = () => {
       </header>
 
       {/* Category tiles */}
-      <section className="bg-white">
+      <section className="bg-redundertone">
         <div className="max-w-7xl mx-auto px-6 pb-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: 'Beats', href: '/beats', bg: 'from-rose-100 to-rose-200' },
-              { label: 'Apparel', href: '/apparel', bg: 'from-emerald-100 to-emerald-200' },
-              { label: 'Licensing', href: '/legal', bg: 'from-sky-100 to-sky-200' },
-              { label: 'About', href: '/#bio', bg: 'from-amber-100 to-amber-200' },
+              { label: 'Beats', href: '/beats', bg: 'bg-gradient-to-br from-red-100 to-red-200', text: 'text-black', border: 'border-gray-200' },
+              { label: 'Apparel', href: '/apparel', bg: 'bg-gradient-to-br from-white to-gray-50', text: 'text-black', border: 'border-gray-200' },
+              { label: 'Licensing', href: '/legal', bg: 'bg-gradient-to-br from-gray-900 to-black', text: 'text-white', border: 'border-gray-800' },
+              { label: 'About', href: '/#bio', bg: 'bg-gradient-to-br from-rose-300 to-red-500', text: 'text-white', border: 'border-red-500' },
             ].map((tile) => (
               <a
                 key={tile.label}
                 href={tile.href}
-                className={`relative overflow-hidden rounded-lg border border-gray-200 bg-gradient-to-br ${tile.bg} aspect-[4/3] flex items-end p-4`}
+                className={`relative overflow-hidden rounded-lg border ${tile.border} ${tile.bg} aspect-[4/3] flex items-end p-4 tile-pop ${tile.label === 'Licensing' ? 'tile-under-red' : 'tile-under-black'}`}
                 aria-label={tile.label}
               >
-                <span className="text-xl font-bold text-gray-900">{tile.label}</span>
+                <span className={`text-xl font-bold ${tile.text}`}>{tile.label}</span>
               </a>
             ))}
           </div>
@@ -109,7 +109,7 @@ const HomePage = () => {
       </section>
 
       {/* Licensing overview */}
-      <section className="py-12 bg-white">
+      <section className="py-12 bg-redundertone">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-2xl font-extrabold text-black">Licensing & Contracts</h2>
           <p className="mt-3 text-gray-800">
@@ -117,7 +117,7 @@ const HomePage = () => {
             exclusive and non-exclusive options with clear terms so you know exactly what you’re getting.
           </p>
           <div className="mt-6">
-            <a href="/legal" className="inline-block px-5 py-2.5 rounded-md bg-black text-white visited:text-white hover:bg-gray-900">Learn More</a>
+            <a href="/legal" className="btn btn-pop btn-black">Learn More</a>
           </div>
         </div>
       </section>

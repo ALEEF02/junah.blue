@@ -31,7 +31,8 @@ module.exports = {
         },
         focus: {
           ring: '#014ecb'
-        }
+        },
+        redundertone: '#f9f4f4'
       }
     }
   },

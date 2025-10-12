@@ -47,10 +47,7 @@ const BeatCard: React.FC<BeatCardProps> = ({ beat }) => {
           <a
             href={`/beats/${beat._id}`}
             aria-disabled={!beat.isAvailable}
-            className={`px-3 py-1.5 rounded-md text-sm font-medium transition
-              ${beat.isAvailable
-                ? 'bg-black text-white visited:text-white hover:bg-gray-900'
-                : 'pointer-events-none opacity-50 bg-gray-200 text-gray-600'}`}
+            className={`${beat.isAvailable ? 'btn btn-pop btn-black' : 'pointer-events-none opacity-50 bg-gray-200 text-gray-600 px-3 py-1.5 rounded-md text-sm font-medium'}`}
             title={beat.isAvailable ? 'Buy Now' : 'Not available'}
           >
             {beat.isAvailable ? 'Buy Now' : 'Unavailable'}

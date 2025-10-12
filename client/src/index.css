@@ -4,7 +4,7 @@
 
 /* Custom global styles */
 body {
-  @apply bg-white text-gray-900;
+  @apply bg-redundertone text-gray-900;
 }
 
 /* Smooth scroll for anchor links */
@@ -31,4 +31,45 @@ a:focus-visible {
 /* Headings: slightly tighter tracking and firm weight */
 h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.01em;
+}
+
+/* Reusable button styles with pop-up hover animation */
+@layer components {
+  .btn {
+    @apply inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-medium transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-black;
+    position: relative; /* create stacking context */
+    z-index: 0;
+  }
+  .btn-black {
+    @apply bg-black text-white visited:text-white;
+    --btn-under-color: #ff9191; /* light red underside */
+  }
+  .btn-white {
+    @apply bg-white text-black;
+    --btn-under-color: #ff9191; /* light red underside */
+  }
+  .btn-red {
+    @apply bg-red-600 text-white;
+    --btn-under-color: #0a0a0a; /* black underside */
+  }
+  .btn-pop { 
+    transition: transform 150ms ease, box-shadow 150ms ease;
+    box-shadow: 0 0 0 0 var(--btn-under-color, rgba(0,0,0,0.85));
+  }
+  .btn-pop:hover { 
+    transform: translateY(-0.125em);
+    text-decoration-line: none;
+    box-shadow: 0 0.25em 0 0 var(--btn-under-color, rgba(0,0,0,0.85));
+  }
+  
+
+  /* Pop effect for tiles */
+  .tile-pop { position: relative; z-index: 0; transition: transform 180ms ease, box-shadow 180ms ease; }
+  .tile-pop:hover { 
+    transform: translateY(-0.125em);
+    text-decoration-line: none;
+    box-shadow: 0 0.25em 0 0 var(--tile-under-color, rgba(0,0,0,0.9));
+  }
+  .tile-under-black { --tile-under-color: #0a0a0a; }
+  .tile-under-red { --tile-under-color: #ef4444; }
 }

@@ -14,8 +14,8 @@ const initialBeatForm = {
   bpm: '',
   key: '',
   tags: '',
-  exclusivePriceCents: 0,
-  nonExclusivePriceCents: 0
+  exclusivePriceCents: '',
+  nonExclusivePriceCents: ''
 };
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuthStateChange }) => {
@@ -180,18 +180,20 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
             onChange={(e) => setBeatForm((current) => ({ ...current, tags: e.target.value }))}
           />
           <input
+            type="number"
             placeholder="Non-exclusive price (cents)"
             className="border border-slate-400 px-3 py-2"
             value={beatForm.nonExclusivePriceCents}
             onChange={(e) =>
-              setBeatForm((current) => ({ ...current, nonExclusivePriceCents: Number(e.target.value || 0) }))
+              setBeatForm((current) => ({ ...current, nonExclusivePriceCents: e.target.value }))
             }
           />
           <input
+            type="number"
             placeholder="Exclusive price (cents)"
             className="border border-slate-400 px-3 py-2"
             value={beatForm.exclusivePriceCents}
-            onChange={(e) => setBeatForm((current) => ({ ...current, exclusivePriceCents: Number(e.target.value || 0) }))}
+            onChange={(e) => setBeatForm((current) => ({ ...current, exclusivePriceCents: e.target.value }))}
           />
           <textarea
             placeholder="Description"

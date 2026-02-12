@@ -1,24 +1,37 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Junah marketplace backend",
+  "main": "app.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "seed": "node scripts/bootstrap.js"
   },
-  "keywords": [],
+  "keywords": [
+    "junah",
+    "marketplace",
+    "beats"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@supabase/supabase-js": "^2.75.0",
+    "@aws-sdk/client-s3": "^3.879.0",
+    "@aws-sdk/client-ses": "^3.879.0",
+    "@aws-sdk/s3-request-presigner": "^3.879.0",
+    "axios": "^1.11.0",
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
-    "mongodb": "^6.19.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.0",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "pdfkit": "^0.17.2",
+    "stripe": "^18.5.0",
+    "zod": "^4.1.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

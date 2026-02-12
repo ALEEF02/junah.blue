@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
@@ -14,5 +14,5 @@ COPY . .
 # Expose port
 EXPOSE 5000
 
-# Start with nodemon for development
-CMD ["npm", "run", "dev"]
+# Default command (production-safe)
+CMD ["npm", "run", "start"]

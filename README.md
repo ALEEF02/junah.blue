@@ -1,88 +1,112 @@
-# Junah Site
+# Junah.blue
 
-## Project Structure
+Full-stack marketplace for Junah beats, licensing contracts, and apparel.
 
+## Stack
+
+- Frontend: React + TypeScript + Tailwind + Framer Motion
+- Backend: Node.js + Express + MongoDB
+- Storage: AWS S3 (beat files + signed agreement PDFs)
+- Payments: Stripe Checkout + Stripe webhooks
+- Fulfillment: Printify API
+- Email: AWS SES
+
+## Required Pages
+
+- `/` Homepage (artist bio + featured beats/apparel)
+- `/apparel` Apparel storefront + checkout
+- `/beats` Beat marketplace + contract-gated checkout
+- `/dashboard` Producer dashboard (owner-only)
+- `/licensing` Legal resource center
+- `/login` Producer login
+
+## Quick Start (Docker)
+
+1. Copy `.env.example` to `.env` and fill credentials.
+2. Start services:
+   ```bash
+   docker-compose up --build
+   ```
+   `docker run -v ~/.config/stripe:/root/.config/stripe -it stripe/stripe-cli:latest listen --forward-to http://localhost:5000/api/webhooks/stripe`
+3. Open:
+   - Frontend: `http://localhost:3000`
+   - Backend: `http://localhost:5000`
+   - Health: `http://localhost:5000/api/health`
+
+If dependencies changed and containers still fail with `ERR_MODULE_NOT_FOUND`, reset persistent dependency volumes and rebuild:
+
+```bash
+docker-compose down -v
+docker-compose up --build
 ```
-junah.blue/
-├── client/          # React frontend application
-├── backend/         # Express.js backend API
-└── docker-compose.yml
+
+## Local Development
+
+### Backend
+
+```bash
+cd backend
+npm install
+npm run dev
 ```
 
-## Prerequisites
+### Frontend
 
-- Node.js
-- npm
-- Docker and Docker Compose
-- MongoDB (if running locally without Docker)
+```bash
+cd client
+npm install
+npm start
+```
 
-## Setup
+## VPS Deployment (Single Server + Nginx)
 
-### Docker Setup
-
-This will run the entire stack in docker:
-
-1. **Clone the repository**
+1. Copy `.env.example` to `.env` and set production values (`FRONTEND_ORIGIN=https://junah.blue`, `REACT_APP_API_URL=https://api.junah.blue`).
+2. Use deployment files in `deploy/`:
+   - `deploy/docker-compose.prod.yml`
+   - `deploy/nginx.conf`
+3. Run from `deploy/`:
    ```bash
-   git clone <repository-url>
-   cd junah.blue
+   docker compose -f docker-compose.prod.yml up --build -d
    ```
+4. Add TLS certificates (Certbot or your preferred ACME flow) and map them to the Nginx container.
 
-2. **Start the application**
-   ```bash
-   docker-compose up -d
-   ```
+## Bootstrapping
 
-3. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:3001
-   - MongoDB: mongodb://localhost:27017
+On backend startup, bootstrap creates:
 
-4. **Stop the application**
-   ```bash
-   docker-compose down
-   ```
+- Owner account (if `OWNER_PASSWORD` or `OWNER_PASSWORD_HASH` is provided)
+- Default artist profile
+- Starter contract templates (`exclusive`, `non-exclusive`, `split`)
 
-### Local Development Setup
+Run explicitly:
 
-#### Backend Setup
+```bash
+cd backend
+npm run seed
+```
 
-1. **Navigate to backend directory**
-   ```bash
-   cd backend
-   ```
+## Important Environment Variables
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+See `.env.example` for full list.
 
-3. **Start MongoDB** (if not using Docker)
-   - Install MongoDB locally or use MongoDB Atlas
-   - Update connection string in `backend/dbConfig/settings.js`
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `AWS_REGION`
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `S3_BUCKET_BEATS`
+- `S3_BUCKET_CONTRACTS`
+- `SES_FROM_EMAIL`
+- `PRINTIFY_API_TOKEN`
+- `PRINTIFY_SHOP_ID`
+- `OWNER_EMAIL`
+- `OWNER_PASSWORD` or `OWNER_PASSWORD_HASH`
 
-4. **Start the backend server**
-   ```bash
-   npm run dev
-   ```
+## API Groups
 
-   Server will start on http://localhost:3001
-
-#### Frontend Setup
-
-1. **Navigate to client directory**
-   ```bash
-   cd client
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**
-   ```bash
-   npm start
-   ```
-
-   Application will open on http://localhost:3000
+- Public: `/api/public/*`
+- Auth: `/api/auth/*`
+- Owner: `/api/owner/*`
+- Stripe webhook: `/api/webhooks/stripe`

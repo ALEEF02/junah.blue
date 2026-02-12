@@ -1,19 +1,33 @@
-version: '3.8'
-
 services:
+  mongo:
+    image: mongo:7
+    container_name: junah-mongo-dev
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - junah-dev-network
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: junah-backend-dev
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       NODE_ENV: development
       PORT: 5000
-      SUPABASE_URL: ${SUPABASE_URL}
-      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      FRONTEND_ORIGIN: http://localhost:3000
+      MONGODB_URI: mongodb://mongo:27017/junah_blue
     ports:
-      - "5000:5000"
+      - '5000:5000'
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      - mongo
     volumes:
       - ./backend:/app
       - backend_node_modules:/app/node_modules
@@ -26,19 +40,23 @@ services:
       dockerfile: Dockerfile
     container_name: junah-frontend-dev
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       NODE_ENV: development
+      PORT: 3000
       REACT_APP_API_URL: http://localhost:5000
-      CHOKIDAR_USEPOLLING: "true"
-      WATCHPACK_POLLING: "true"
-      SKIP_PREFLIGHT_CHECK: "true"
+      CHOKIDAR_USEPOLLING: 'true'
+      WATCHPACK_POLLING: 'true'
+      SKIP_PREFLIGHT_CHECK: 'true'
       WDS_SOCKET_HOST: 0.0.0.0
       WDS_SOCKET_PORT: 3000
-      FAST_REFRESH: "false"
+      FAST_REFRESH: 'false'
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - backend
+    command: sh -c "npm install --legacy-peer-deps && npm start"
     volumes:
       - ./client:/app
       - frontend_node_modules:/app/node_modules
@@ -51,6 +69,8 @@ volumes:
   backend_node_modules:
     driver: local
   frontend_node_modules:
+    driver: local
+  mongo_data:
     driver: local
 
 networks:

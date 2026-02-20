@@ -97,6 +97,7 @@ export interface OwnerOrder {
 export interface OwnerContract {
   _id: string;
   templateType: LicenseType;
+  beatTitle?: string;
   buyerName: string;
   buyerEmail: string;
   signedAt: string;

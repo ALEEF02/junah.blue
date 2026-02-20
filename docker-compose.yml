@@ -65,6 +65,20 @@ services:
     stdin_open: true
     tty: true
 
+  stripe-webhook:
+    image: stripe/stripe-cli:latest
+    container_name: junah-stripe-webhook-dev
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - backend
+    command: listen --forward-to http://backend:5000/api/webhooks/stripe --events checkout.session.completed
+    volumes:
+      - ${HOME}/.config/stripe:/root/.config/stripe
+    networks:
+      - junah-dev-network
+
 volumes:
   backend_node_modules:
     driver: local

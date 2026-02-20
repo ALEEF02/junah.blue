@@ -279,7 +279,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
             {orders.slice(0, 12).map((order) => (
               <div key={order._id} className="border border-slate-200 p-2 text-sm">
                 <p className="text-slate-900">{order.type.toUpperCase()} - {formatCurrency(order.amountTotal)}</p>
-                <p className="text-slate-600">{order.buyerEmail} | {order.paymentStatus} | {order.fulfillmentStatus}</p>
+                <p className="text-slate-600">{order.buyerEmail} | {order.paymentStatus} | Printify {order.fulfillmentStatus}</p>
               </div>
             ))}
           </div>
@@ -290,7 +290,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
           <div className="mt-3 space-y-2">
             {contracts.slice(0, 12).map((contract) => (
               <div key={contract._id} className="border border-slate-200 p-2 text-sm">
-                <p className="text-slate-900">{contract.templateType.toUpperCase()} - {contract.buyerName}</p>
+                <p className="text-slate-900">{contract.templateType.toUpperCase()} with {contract.buyerName}</p>
+                <p className="text-slate-700">Beat: {contract.beatTitle || 'Unknown Beat'}</p>
                 <p className="text-slate-600">{contract.buyerEmail} | {new Date(contract.signedAt).toLocaleString()}</p>
               </div>
             ))}

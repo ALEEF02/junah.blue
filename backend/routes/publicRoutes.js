@@ -19,7 +19,7 @@ const SignContractSchema = z.object({
   licenseType: z.enum(['exclusive', 'non-exclusive', 'split']),
   templateId: z.string().min(1),
   buyerName: z.string().min(2),
-  buyerEmail: z.string().email(),
+  buyerEmail: z.email(),
   typedSignature: z.string().min(2),
   acceptedFullTerms: z.literal(true),
   acceptedSummary: z.literal(true)
@@ -29,11 +29,11 @@ const BeatCheckoutSchema = z.object({
   beatId: z.string().min(1),
   licenseType: z.enum(['exclusive', 'non-exclusive', 'split']),
   agreementId: z.string().min(1),
-  buyerEmail: z.string().email().optional()
+  buyerEmail: z.email().optional()
 });
 
 const ApparelCheckoutSchema = z.object({
-  buyerEmail: z.string().email().optional(),
+  buyerEmail: z.email().optional(),
   items: z
     .array(
       z.object({

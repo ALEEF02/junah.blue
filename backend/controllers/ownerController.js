@@ -75,8 +75,34 @@ export const getOwnerOrders = async (_req, res) => {
 };
 
 export const getOwnerContracts = async (_req, res) => {
-  const contracts = await SignedAgreement.find().sort({ createdAt: -1 }).limit(250).lean();
-  return res.status(200).json({ contracts });
+  const contracts = await SignedAgreement.aggregate([
+    { $sort: { createdAt: -1 } },
+    { $limit: 250 },
+    {
+      $lookup: {
+        from: 'beats',
+        localField: 'beatId',
+        foreignField: '_id',
+        as: 'beat'
+      }
+    },
+    {
+      $addFields: {
+        beatTitle: {
+          $ifNull: [{ $arrayElemAt: ['$beat.title', 0] }, 'Unknown Beat']
+        }
+      }
+    },
+    {
+      $project: {
+        beat: 0
+      }
+    }
+  ]);
+
+  return res.status(200).json({
+    contracts
+  });
 };
 
 export const getOwnerOverview = async (_req, res) => {

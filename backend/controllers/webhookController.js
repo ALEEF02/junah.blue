@@ -168,7 +168,7 @@ const handleApparelCheckoutCompleted = async (session) => {
   } catch (error) {
     order.fulfillmentStatus = 'failed';
     await order.save();
-    console.error('Printify fulfillment failed:', error.message);
+    console.error('Printify fulfillment failed:', error.message, error.response ? '\n\t' : '', error.response?.data);
   }
 };
 

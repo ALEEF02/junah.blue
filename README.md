@@ -27,11 +27,11 @@ Full-stack marketplace for Junah beats, licensing contracts, and apparel.
    ```bash
    docker-compose up --build
    ```
-   `docker run -v ~/.config/stripe:/root/.config/stripe -it stripe/stripe-cli:latest listen --forward-to http://localhost:5000/api/webhooks/stripe`
 3. Open:
    - Frontend: `http://localhost:3000`
    - Backend: `http://localhost:5000`
    - Health: `http://localhost:5000/api/health`
+   - Stripe webhook forwarder logs: `docker logs -f junah-stripe-webhook-dev`
 
 If dependencies changed and containers still fail with `ERR_MODULE_NOT_FOUND`, reset persistent dependency volumes and rebuild:
 
@@ -39,6 +39,22 @@ If dependencies changed and containers still fail with `ERR_MODULE_NOT_FOUND`, r
 docker-compose down -v
 docker-compose up --build
 ```
+
+## Stripe Webhook In Dev
+
+`docker-compose.yml` includes a `stripe-webhook` service that runs:
+
+```bash
+stripe listen --forward-to http://backend:5000/api/webhooks/stripe --events checkout.session.completed
+```
+
+One-time setup on your machine:
+
+1. Authenticate Stripe CLI config (creates `~/.config/stripe`):
+   ```bash
+   docker run -v ~/.config/stripe:/root/.config/stripe -it stripe/stripe-cli:latest login
+   ```
+2. Set `STRIPE_WEBHOOK_SECRET` in `.env` to the signing secret printed by the running webhook listener.
 
 ## Local Development
 

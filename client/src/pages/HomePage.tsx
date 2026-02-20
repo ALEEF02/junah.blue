@@ -14,26 +14,80 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [profile, setProfile] = useState<ArtistProfile | null>(null);
   const [beats, setBeats] = useState<Beat[]>([]);
   const [apparel, setApparel] = useState<ApparelProduct[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [beatsLoading, setBeatsLoading] = useState(true);
+  const [apparelLoading, setApparelLoading] = useState(true);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [beatsError, setBeatsError] = useState<string | null>(null);
+  const [apparelError, setApparelError] = useState<string | null>(null);
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const [profileRes, beatsRes, apparelRes] = await Promise.all([
-          api.getPublicProfile(),
-          api.getPublicBeats(),
-          api.getApparelProducts()
-        ]);
+    let cancelled = false;
 
-        setProfile(profileRes);
-        setBeats(beatsRes.beats.slice(0, 4));
-        setApparel(apparelRes.products.slice(0, 3));
+    const loadProfile = async () => {
+      try {
+        setProfileLoading(true);
+        setProfileError(null);
+        const profileRes = await api.getPublicProfile();
+        if (!cancelled) {
+          setProfile(profileRes);
+        }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unable to load homepage data');
+        if (!cancelled) {
+          setProfileError(err instanceof Error ? err.message : 'Unable to load biography');
+        }
+      } finally {
+        if (!cancelled) {
+          setProfileLoading(false);
+        }
       }
     };
 
-    load();
+    const loadBeats = async () => {
+      try {
+        setBeatsLoading(true);
+        setBeatsError(null);
+        const beatsRes = await api.getPublicBeats();
+        if (!cancelled) {
+          setBeats(beatsRes.beats.slice(0, 4));
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setBeatsError(err instanceof Error ? err.message : 'Unable to load beats');
+        }
+      } finally {
+        if (!cancelled) {
+          setBeatsLoading(false);
+        }
+      }
+    };
+
+    const loadApparel = async () => {
+      try {
+        setApparelLoading(true);
+        setApparelError(null);
+        const apparelRes = await api.getApparelProducts();
+        if (!cancelled) {
+          setApparel(apparelRes.products.slice(0, 3));
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setApparelError(err instanceof Error ? err.message : 'Unable to load apparel');
+        }
+      } finally {
+        if (!cancelled) {
+          setApparelLoading(false);
+        }
+      }
+    };
+
+    loadProfile();
+    loadBeats();
+    loadApparel();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -59,12 +113,18 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 md:px-6">
-        <SectionHeader eyebrow="Biography" title={profile?.headline || 'Junah'} description={profile?.bio} />
+        <SectionHeader
+          eyebrow="Biography"
+          title={profile?.headline || 'Junah'}
+          description={profileLoading ? 'Loading biography...' : profile?.bio}
+        />
+        {profileError ? <p className="text-red-600">{profileError}</p> : null}
       </section>
 
       <section className="mx-auto max-w-6xl px-4 md:px-6">
         <SectionHeader eyebrow="Beat Marketplace" title="Featured Beats" />
-        {error ? <p className="text-red-600">{error}</p> : null}
+        {beatsError ? <p className="text-red-600">{beatsError}</p> : null}
+        {beatsLoading ? <p className="text-slate-600">Loading beats...</p> : null}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {beats.map((beat, index) => (
             <EditorialCard
@@ -80,6 +140,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
       <section className="mx-auto max-w-6xl px-4 md:px-6">
         <SectionHeader eyebrow="Apparel" title="Latest Drops" />
+        {apparelError ? <p className="text-red-600">{apparelError}</p> : null}
+        {apparelLoading ? <p className="text-slate-600">Loading apparel...</p> : null}
         <div className="grid gap-6 md:grid-cols-3">
           {apparel.map((product, index) => (
             <EditorialCard

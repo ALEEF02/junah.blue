@@ -133,6 +133,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               title={beat.title}
               description={`${formatCurrency(beat.pricing.nonExclusivePriceCents)} non-exclusive / ${formatCurrency(beat.pricing.exclusivePriceCents)} exclusive`}
               accent={index % 2 === 0 ? 'text-violet-600' : 'text-cyan-500'}
+              onArrowClick={() => onNavigate('/beats')}
             />
           ))}
         </div>
@@ -155,6 +156,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               }
               imageUrl={product.imageUrl}
               accent={index === 1 ? 'text-emerald-500' : 'text-violet-600'}
+              onArrowClick={() => onNavigate('/apparel')}
             />
           ))}
         </div>

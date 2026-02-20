@@ -102,3 +102,26 @@ export interface OwnerContract {
   buyerEmail: string;
   signedAt: string;
 }
+
+export interface CheckoutStatusLineItem {
+  label: string;
+  quantity: number;
+  amountCents: number;
+}
+
+export interface CheckoutStatusOrder {
+  type: 'beat' | 'apparel';
+  amountTotalCents: number;
+  amountTaxCents: number;
+  currency: string;
+  paymentStatus: string;
+  fulfillmentStatus: string;
+  buyerEmailMasked: string;
+  createdAt: string;
+  lineItems: CheckoutStatusLineItem[];
+}
+
+export interface CheckoutStatusResponse {
+  status: 'processing' | 'completed';
+  order?: CheckoutStatusOrder;
+}

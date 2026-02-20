@@ -2,6 +2,7 @@ import Beat from '../models/Beat.js';
 import ArtistProfile from '../models/ArtistProfile.js';
 import ContractTemplate from '../models/ContractTemplate.js';
 import SignedAgreement from '../models/SignedAgreement.js';
+import Order from '../models/Order.js';
 import { getBeatSignedReadUrl } from '../services/s3Service.js';
 import { createBeatCheckoutSession, createApparelCheckoutSession } from '../services/stripeService.js';
 import { syncPrintifyCatalog } from '../services/printifyService.js';
@@ -203,4 +204,44 @@ export const createApparelCheckout = async (req, res) => {
   });
 
   return res.status(200).json({ checkoutUrl: session.url, sessionId: session.id });
+};
+
+const maskEmail = (email = '') => {
+  const [local = '', domain = ''] = String(email).split('@');
+  if (!local || !domain) return '';
+  if (local.length <= 2) return `${local[0] || '*'}*@${domain}`;
+  return `${local.slice(0, 2)}${'*'.repeat(Math.max(1, local.length - 2))}@${domain}`;
+};
+
+export const getCheckoutStatus = async (req, res) => {
+  const { sessionId } = req.params;
+
+  if (!sessionId) {
+    return res.status(400).json({ error: 'Missing checkout session id' });
+  }
+
+  const order = await Order.findOne({ stripeCheckoutSessionId: sessionId }).lean();
+
+  if (!order) {
+    return res.status(200).json({ status: 'processing' });
+  }
+
+  return res.status(200).json({
+    status: 'completed',
+    order: {
+      type: order.type,
+      amountTotalCents: order.amountTotal,
+      amountTaxCents: order.amountTax,
+      currency: String(order.currency || 'usd').toUpperCase(),
+      paymentStatus: order.paymentStatus,
+      fulfillmentStatus: order.fulfillmentStatus,
+      buyerEmailMasked: maskEmail(order.buyerEmail),
+      createdAt: order.createdAt,
+      lineItems: (order.lineItems || []).map((item) => ({
+        label: item.label,
+        quantity: item.quantity,
+        amountCents: item.amountCents
+      }))
+    }
+  });
 };

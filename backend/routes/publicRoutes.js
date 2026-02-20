@@ -3,6 +3,7 @@ import { z } from 'zod';
 import {
   createApparelCheckout,
   createBeatCheckout,
+  getCheckoutStatus,
   getApparelProducts,
   getContractTemplates,
   getPublicBeatById,
@@ -51,6 +52,7 @@ router.get('/beats/:beatId', getPublicBeatById);
 router.get('/contracts/templates', getContractTemplates);
 router.post('/contracts/sign', validateBody(SignContractSchema), signContract);
 router.post('/checkout/beat-session', validateBody(BeatCheckoutSchema), createBeatCheckout);
+router.get('/checkout/status/:sessionId', getCheckoutStatus);
 router.get('/apparel/products', getApparelProducts);
 router.post('/checkout/apparel-session', validateBody(ApparelCheckoutSchema), createApparelCheckout);
 

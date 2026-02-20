@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { api, formatCurrency } from '../lib/api';
+import { savePendingCheckout } from '../lib/checkoutFeedback';
 import { ApparelProduct } from '../types/api';
 import { SectionHeader } from '../components/SectionHeader';
 
@@ -98,6 +99,20 @@ export const ApparelPage: React.FC = () => {
           productId: item.productId,
           variantId: item.variantId,
           quantity: item.quantity
+        }))
+      });
+
+      savePendingCheckout({
+        sessionId: response.sessionId,
+        type: 'apparel',
+        createdAt: new Date().toISOString(),
+        currency: 'USD',
+        buyerEmail: buyerEmail || undefined,
+        amountTotalCents: cartTotal,
+        lineItems: cart.map((item) => ({
+          label: item.label,
+          quantity: item.quantity,
+          amountCents: item.amountCents
         }))
       });
 

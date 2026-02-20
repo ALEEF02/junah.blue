@@ -2,6 +2,7 @@ import {
   ApparelProduct,
   ArtistProfile,
   Beat,
+  CheckoutStatusResponse,
   ContractTemplate,
   LicenseType,
   OwnerBeat,
@@ -64,6 +65,8 @@ export const api = {
     agreementId: string;
     buyerEmail: string;
   }) => request<{ checkoutUrl: string; sessionId: string }>('/api/public/checkout/beat-session', { method: 'POST', body: JSON.stringify(payload) }),
+  getCheckoutStatus: (sessionId: string) =>
+    request<CheckoutStatusResponse>(`/api/public/checkout/status/${encodeURIComponent(sessionId)}`),
   getApparelProducts: () => request<{ products: ApparelProduct[] }>('/api/public/apparel/products'),
   createApparelCheckoutSession: (payload: {
     buyerEmail?: string;

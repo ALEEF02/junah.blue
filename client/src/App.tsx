@@ -10,7 +10,13 @@ import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { usePathRouter } from './hooks/usePathRouter';
 import { api } from './lib/api';
-import { OwnerUser } from './types/api';
+import { CheckoutStatusOrder, OwnerUser } from './types/api';
+import {
+  clearPendingCheckout,
+  getPendingCheckout,
+  pendingCheckoutToOrder
+} from './lib/checkoutFeedback';
+import { CheckoutFeedbackModal } from './components/CheckoutFeedbackModal';
 
 const NotFoundPage: React.FC = () => (
   <div className="mx-auto max-w-4xl px-4 py-16 md:px-6">
@@ -23,6 +29,13 @@ const NotFoundPage: React.FC = () => (
 function App() {
   const { path, navigate } = usePathRouter();
   const [ownerUser, setOwnerUser] = useState<OwnerUser | null>(null);
+  const [checkoutModal, setCheckoutModal] = useState<{
+    outcome: 'success' | 'failure';
+    sessionId?: string;
+    order?: CheckoutStatusOrder;
+    message?: string;
+  } | null>(null);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   useEffect(() => {
     api
@@ -30,6 +43,85 @@ function App() {
       .then((response) => setOwnerUser(response.user))
       .catch(() => setOwnerUser(null));
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const checkout = params.get('checkout');
+
+    if (!checkout) return;
+
+    const normalized =
+      checkout === 'success'
+        ? 'success'
+        : ['failed', 'cancelled', 'canceled', 'cancel'].includes(checkout)
+          ? 'failure'
+          : null;
+
+    if (!normalized) return;
+
+    const rawSessionId = params.get('session_id') || '';
+    const sessionId =
+      rawSessionId && !rawSessionId.includes('{CHECKOUT_SESSION_ID}') ? rawSessionId : undefined;
+    const pending = getPendingCheckout();
+    let cancelled = false;
+
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    const resolveFeedback = async () => {
+      let order: CheckoutStatusOrder | undefined;
+      let message = '';
+
+      if (sessionId) {
+        if (normalized === 'success') {
+          if (!cancelled) setCheckoutLoading(true);
+          for (let attempt = 0; attempt < 6; attempt += 1) {
+            const status = await api.getCheckoutStatus(sessionId).catch(() => null);
+            if (status?.status === 'completed' && status.order) {
+              order = status.order;
+              break;
+            }
+            if (attempt < 5) {
+              await sleep(1000);
+            }
+          }
+          if (!cancelled) setCheckoutLoading(false);
+          if (!order) {
+            message = 'Payment succeeded. We are finalizing order details and fulfillment records.';
+          }
+        } else {
+          const status = await api.getCheckoutStatus(sessionId).catch(() => null);
+          if (status?.status === 'completed' && status.order) {
+            order = status.order;
+          }
+        }
+      }
+
+      if (!order && pending && (!sessionId || pending.sessionId === sessionId)) {
+        order = pendingCheckoutToOrder(pending);
+      }
+
+      if (!cancelled) {
+        setCheckoutModal({
+          outcome: normalized,
+          sessionId,
+          order,
+          message: normalized === 'failure' ? 'You can retry checkout when ready.' : message || undefined
+        });
+      }
+
+      if (sessionId) {
+        clearPendingCheckout(sessionId);
+      } else if (pending) {
+        clearPendingCheckout();
+      }
+    };
+
+    resolveFeedback();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [path]);
 
   const content = useMemo(() => {
     if (path === '/') return <HomePage onNavigate={navigate} />;
@@ -62,11 +154,30 @@ function App() {
     navigate('/');
   };
 
+  const closeCheckoutModal = () => {
+    setCheckoutModal(null);
+    setCheckoutLoading(false);
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete('checkout');
+    url.searchParams.delete('session_id');
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+  };
+
   return (
     <div className="min-h-screen bg-stone-100 text-slate-900">
       <Navbar path={path} onNavigate={navigate} isOwnerAuthed={Boolean(ownerUser)} onLogout={logout} />
       <main>{content}</main>
       <Footer onNavigate={navigate} />
+      <CheckoutFeedbackModal
+        isOpen={Boolean(checkoutModal)}
+        outcome={checkoutModal?.outcome || 'success'}
+        sessionId={checkoutModal?.sessionId}
+        order={checkoutModal?.order}
+        message={checkoutModal?.message}
+        isLoading={checkoutLoading}
+        onClose={closeCheckoutModal}
+      />
     </div>
   );
 }

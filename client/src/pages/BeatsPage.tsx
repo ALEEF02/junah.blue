@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { api, formatCurrency } from '../lib/api';
+import { savePendingCheckout } from '../lib/checkoutFeedback';
 import { Beat, ContractTemplate, LicenseType } from '../types/api';
 import { SectionHeader } from '../components/SectionHeader';
 import { AudioPreviewPlayer } from '../components/AudioPreviewPlayer';
@@ -66,6 +67,28 @@ export const BeatsPage: React.FC = () => {
         licenseType: payload.licenseType,
         agreementId: signed.agreementId,
         buyerEmail: payload.buyerEmail
+      });
+
+      const beat = beats.find((entry) => entry.id === payload.beatId);
+      const amountCents =
+        payload.licenseType === 'exclusive'
+          ? beat?.pricing.exclusivePriceCents || 0
+          : beat?.pricing.nonExclusivePriceCents || 0;
+
+      savePendingCheckout({
+        sessionId: checkout.sessionId,
+        type: 'beat',
+        createdAt: new Date().toISOString(),
+        currency: 'USD',
+        buyerEmail: payload.buyerEmail,
+        amountTotalCents: amountCents,
+        lineItems: [
+          {
+            label: `${beat?.title || 'Beat'} - ${payload.licenseType}`,
+            quantity: 1,
+            amountCents
+          }
+        ]
       });
 
       window.location.assign(checkout.checkoutUrl);

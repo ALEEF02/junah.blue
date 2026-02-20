@@ -279,7 +279,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
             {orders.slice(0, 12).map((order) => (
               <div key={order._id} className="border border-slate-200 p-2 text-sm">
                 <p className="text-slate-900">{order.type.toUpperCase()} - {formatCurrency(order.amountTotal)}</p>
-                <p className="text-slate-600">{order.buyerEmail} | {order.paymentStatus} | Order {order.fulfillmentStatus}</p>
+                <p className="text-slate-600">{order.buyerEmail} | {order.paymentStatus} | Order {order.fulfillmentStatus} | {new Date(order.createdAt).toLocaleString()}</p>
               </div>
             ))}
           </div>

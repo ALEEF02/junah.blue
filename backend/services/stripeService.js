@@ -7,6 +7,17 @@ const assertStripe = () => {
   }
 };
 
+const withCheckoutParams = (url, status, includeSessionId = true) => {
+  let next = url;
+  if (!/[?&]checkout=/.test(next)) {
+    next += `${next.includes('?') ? '&' : '?'}checkout=${status}`;
+  }
+  if (includeSessionId && !/[?&]session_id=/.test(next)) {
+    next += `${next.includes('?') ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`;
+  }
+  return next;
+};
+
 export const createBeatCheckoutSession = async ({ beat, licenseType, buyerEmail, agreementId }) => {
   assertStripe();
 
@@ -20,8 +31,8 @@ export const createBeatCheckoutSession = async ({ beat, licenseType, buyerEmail,
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
-    success_url: env.STRIPE_SUCCESS_URL,
-    cancel_url: env.STRIPE_CANCEL_URL,
+    success_url: withCheckoutParams(env.STRIPE_SUCCESS_URL, 'success', true),
+    cancel_url: withCheckoutParams(env.STRIPE_CANCEL_URL, 'failed', false),
     customer_email: buyerEmail,
     tax_id_collection: { enabled: env.STRIPE_TAX_ENABLED },
     automatic_tax: { enabled: env.STRIPE_TAX_ENABLED },
@@ -54,8 +65,8 @@ export const createApparelCheckoutSession = async ({ buyerEmail, lineItems, meta
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
-    success_url: env.STRIPE_SUCCESS_URL,
-    cancel_url: env.STRIPE_CANCEL_URL,
+    success_url: withCheckoutParams(env.STRIPE_SUCCESS_URL, 'success', true),
+    cancel_url: withCheckoutParams(env.STRIPE_CANCEL_URL, 'failed', false),
     customer_email: buyerEmail || undefined,
     automatic_tax: { enabled: env.STRIPE_TAX_ENABLED },
     shipping_address_collection: {

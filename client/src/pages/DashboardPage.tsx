@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { api, formatCurrency } from '../lib/api';
 import { OwnerBeat, OwnerContract, OwnerOrder, OwnerOverview, OwnerUser } from '../types/api';
 import { SectionHeader } from '../components/SectionHeader';
@@ -29,11 +29,21 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
   const [beatForm, setBeatForm] = useState(initialBeatForm);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<Record<string, { preview?: File; full?: File }>>({});
+  const skipFirstContractsReload = useRef(true);
+
+  const isAuthError = (message: string) =>
+    [
+      'Authentication required',
+      'Invalid authentication token',
+      'Forbidden',
+      'User not found'
+    ].includes(message);
 
   const loadData = async ({ sync = true, showLoader = true }: { sync?: boolean; showLoader?: boolean } = {}) => {
     try {
-      if (showLoader) setLoading(true);
+      if (showLoader && !initialized) setLoading(true);
       if (sync) setSyncingStripe(true);
       setError(null);
 
@@ -53,17 +63,29 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
       setOrders(ordersRes.orders);
       setContracts(contractsRes.contracts);
     } catch (err) {
-      setUser(null);
-      onAuthStateChange(null);
-      setError(err instanceof Error ? err.message : 'Unable to load dashboard');
+      const message = err instanceof Error ? err.message : 'Unable to load dashboard';
+      if (isAuthError(message)) {
+        setUser(null);
+        onAuthStateChange(null);
+      }
+      setError(message);
     } finally {
-      if (showLoader) setLoading(false);
+      if (showLoader && !initialized) setLoading(false);
       if (sync) setSyncingStripe(false);
+      setInitialized(true);
     }
   };
 
   useEffect(() => {
     loadData({ sync: true, showLoader: true });
+  }, []);
+
+  useEffect(() => {
+    if (skipFirstContractsReload.current) {
+      skipFirstContractsReload.current = false;
+      return;
+    }
+    loadData({ sync: true, showLoader: false });
   }, [includeUnpaidContracts]);
 
   const revenue = useMemo(() => formatCurrency(overview?.grossRevenueCents || 0), [overview]);
@@ -134,7 +156,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
     }
   };
 
-  if (loading) {
+  if (loading && !initialized) {
     return <div className="mx-auto max-w-6xl px-4 py-10 md:px-6">Loading dashboard...</div>;
   }
 

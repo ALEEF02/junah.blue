@@ -195,7 +195,7 @@ export const createApparelCheckout = async (req, res) => {
         unit_amount: variant.priceCents,
         product_data: {
           name: `${product.title} - ${variant.title}`,
-          images: product.imageUrl ? [product.imageUrl] : undefined
+          images: (variant.imageUrl || product.imageUrl) ? [variant.imageUrl || product.imageUrl] : undefined
         }
       }
     });

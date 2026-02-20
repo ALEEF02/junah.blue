@@ -2,14 +2,32 @@ import { printifyClient } from '../config/printify.js';
 import { env, hasPrintifyConfigured } from '../config/env.js';
 import ApparelCatalogCache from '../models/ApparelCatalogCache.js';
 
+const APPAREL_CACHE_VERSION = 2;
+
 const assertPrintify = () => {
   if (!hasPrintifyConfigured || !printifyClient) {
     throw new Error('Printify is not configured. Set PRINTIFY_API_TOKEN and PRINTIFY_SHOP_ID.');
   }
 };
 
+const matchVariantImage = (images, variantId, fallbackImageUrl) => {
+  const variantIdString = String(variantId);
+  const image =
+    images.find((entry) =>
+      Array.isArray(entry.variant_ids) && entry.variant_ids.some((id) => String(id) === variantIdString)
+    ) || null;
+
+  return image?.src || fallbackImageUrl;
+};
+
+const hasVariantImages = (products = []) =>
+  products.every((product) =>
+    (product.variants || []).every((variant) => typeof variant.imageUrl === 'string' && variant.imageUrl.length > 0)
+  );
+
 const mapPrintifyProduct = (product) => {
   const imageUrl = product.images?.[0]?.src || '';
+  const images = product.images || [];
 
   return {
     id: product.id,
@@ -19,6 +37,7 @@ const mapPrintifyProduct = (product) => {
     variants: (product.variants || [])
       .filter((variant) => variant.is_enabled)
       .map((variant) => ({
+        imageUrl: matchVariantImage(images, variant.id, imageUrl),
         id: variant.id,
         title: variant.title,
         priceCents: variant.price,
@@ -36,7 +55,10 @@ export const syncPrintifyCatalog = async (force = false) => {
 
   if (!force && cache?.syncedAt) {
     const ageSeconds = (now - new Date(cache.syncedAt).getTime()) / 1000;
-    if (ageSeconds < env.APPAREL_SYNC_TTL_SECONDS) {
+    const cacheNeedsVariantImageRefresh = !hasVariantImages(cache.products || []);
+    const cacheVersionOutdated = Number(cache.cacheVersion || 1) < APPAREL_CACHE_VERSION;
+
+    if (ageSeconds < env.APPAREL_SYNC_TTL_SECONDS && !cacheNeedsVariantImageRefresh && !cacheVersionOutdated) {
       return cache.products;
     }
   }
@@ -49,6 +71,7 @@ export const syncPrintifyCatalog = async (force = false) => {
     {
       source: 'printify',
       products,
+      cacheVersion: APPAREL_CACHE_VERSION,
       syncedAt: new Date()
     },
     { upsert: true, new: true }

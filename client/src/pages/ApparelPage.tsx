@@ -155,7 +155,13 @@ export const ApparelPage: React.FC = () => {
                 </div>
 
                 <div className="aspect-square bg-slate-100">
-                  {product.imageUrl ? <img src={product.imageUrl} alt={product.title} className="h-full w-full object-cover" /> : null}
+                  {(selectedVariant?.imageUrl || product.imageUrl) ? (
+                    <img
+                      src={selectedVariant?.imageUrl || product.imageUrl}
+                      alt={`${product.title} - ${selectedVariant?.title || 'Variant'}`}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : null}
                 </div>
 
                 <div className="space-y-3 p-3">

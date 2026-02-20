@@ -41,6 +41,7 @@ export interface ContractTemplate {
 export interface ApparelVariant {
   id: number | string;
   title: string;
+  imageUrl?: string;
   priceCents: number;
   sku: string;
   isAvailable: boolean;

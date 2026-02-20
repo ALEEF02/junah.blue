@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "seed": "node scripts/bootstrap.js"
+    "seed": "node scripts/bootstrap.js",
+    "backfill:payments": "node scripts/backfillPaymentState.js"
   },
   "keywords": [
     "junah",

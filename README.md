@@ -45,7 +45,7 @@ docker-compose up --build
 `docker-compose.yml` includes a `stripe-webhook` service that runs:
 
 ```bash
-stripe listen --forward-to http://backend:5000/api/webhooks/stripe --events checkout.session.completed
+stripe listen --forward-to http://backend:5000/api/webhooks/stripe --events checkout.session.completed,checkout.session.expired,checkout.session.async_payment_failed,payment_intent.payment_failed,payment_intent.canceled,charge.refunded,charge.dispute.created,charge.dispute.updated,charge.dispute.closed
 ```
 
 One-time setup on your machine:
@@ -99,6 +99,13 @@ Run explicitly:
 ```bash
 cd backend
 npm run seed
+```
+
+Backfill payment state fields for existing documents:
+
+```bash
+cd backend
+npm run backfill:payments
 ```
 
 ## Important Environment Variables

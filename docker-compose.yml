@@ -73,7 +73,7 @@ services:
       - .env
     depends_on:
       - backend
-    command: listen --forward-to http://backend:5000/api/webhooks/stripe --events checkout.session.completed
+    command: listen --forward-to http://backend:5000/api/webhooks/stripe --events checkout.session.completed,checkout.session.expired,checkout.session.async_payment_failed,payment_intent.payment_failed,payment_intent.canceled,charge.refunded,charge.dispute.created,charge.dispute.updated,charge.dispute.closed
     volumes:
       - ${HOME}/.config/stripe:/root/.config/stripe
     networks:

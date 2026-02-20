@@ -88,8 +88,17 @@ export interface OwnerOrder {
   type: 'beat' | 'apparel';
   buyerEmail: string;
   buyerName: string;
+  licenseType?: LicenseType | '';
   amountTotal: number;
+  amountRefunded?: number;
   paymentStatus: string;
+  stripePaymentState?: string;
+  stripeCheckoutSessionId?: string;
+  stripePaymentIntentId?: string;
+  stripeChargeId?: string;
+  stripeDisputeStatus?: string;
+  needsManualReview?: boolean;
+  lastStripeSyncAt?: string | null;
   fulfillmentStatus: string;
   createdAt: string;
 }
@@ -98,6 +107,12 @@ export interface OwnerContract {
   _id: string;
   templateType: LicenseType;
   beatTitle?: string;
+  paymentState?: string;
+  orderId?: string | null;
+  stripeCheckoutSessionId?: string;
+  stripePaymentIntentId?: string;
+  stripeChargeId?: string;
+  needsManualReview?: boolean;
   buyerName: string;
   buyerEmail: string;
   signedAt: string;

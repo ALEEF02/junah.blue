@@ -14,6 +14,15 @@ import {
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
+const buildQuery = (params: Record<string, string | number | boolean | undefined>) => {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined) return;
+    query.set(key, String(value));
+  });
+  return query.toString() ? `?${query.toString()}` : '';
+};
+
 const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
   const response = await fetch(`${API_BASE}${path}`, {
     credentials: 'include',
@@ -79,7 +88,8 @@ export const api = {
     }),
   logoutOwner: () => request<{ success: boolean }>('/api/auth/logout', { method: 'POST' }),
   getOwnerMe: () => request<{ user: OwnerUser }>('/api/auth/me'),
-  getOwnerOverview: () => request<{ overview: OwnerOverview }>('/api/owner/overview'),
+  getOwnerOverview: (options?: { sync?: boolean }) =>
+    request<{ overview: OwnerOverview }>(`/api/owner/overview${buildQuery({ sync: options?.sync })}`),
   getOwnerBeats: () => request<{ beats: OwnerBeat[] }>('/api/owner/beats'),
   createOwnerBeat: (payload: {
     title: string;
@@ -112,8 +122,16 @@ export const api = {
 
     return response.json() as Promise<{ beat: OwnerBeat }>;
   },
-  getOwnerOrders: () => request<{ orders: OwnerOrder[] }>('/api/owner/orders'),
-  getOwnerContracts: () => request<{ contracts: OwnerContract[] }>('/api/owner/contracts')
+  getOwnerOrders: (options?: { sync?: boolean; limit?: number }) =>
+    request<{ orders: OwnerOrder[] }>(`/api/owner/orders${buildQuery({ sync: options?.sync, limit: options?.limit })}`),
+  getOwnerContracts: (options?: { sync?: boolean; includeUnpaid?: boolean; limit?: number }) =>
+    request<{ contracts: OwnerContract[] }>(
+      `/api/owner/contracts${buildQuery({
+        sync: options?.sync,
+        includeUnpaid: options?.includeUnpaid,
+        limit: options?.limit
+      })}`
+    )
 };
 
 export const formatCurrency = (cents: number, currency = 'USD') =>

@@ -86,3 +86,23 @@ export const verifyStripeEvent = (payload, signature, webhookSecret) => {
   assertStripe();
   return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
 };
+
+export const getStripeCheckoutSession = async (sessionId, expand = []) => {
+  assertStripe();
+  return stripe.checkout.sessions.retrieve(sessionId, expand.length ? { expand } : undefined);
+};
+
+export const getStripePaymentIntent = async (paymentIntentId, expand = []) => {
+  assertStripe();
+  return stripe.paymentIntents.retrieve(paymentIntentId, expand.length ? { expand } : undefined);
+};
+
+export const getStripeCharge = async (chargeId, expand = []) => {
+  assertStripe();
+  return stripe.charges.retrieve(chargeId, expand.length ? { expand } : undefined);
+};
+
+export const getStripeDispute = async (disputeId, expand = []) => {
+  assertStripe();
+  return stripe.disputes.retrieve(disputeId, expand.length ? { expand } : undefined);
+};

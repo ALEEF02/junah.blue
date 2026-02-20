@@ -118,7 +118,10 @@ export const signContract = async (req, res) => {
     acceptedSummary,
     buyerIp: req.headers['x-forwarded-for']?.toString().split(',')[0]?.trim() || req.ip,
     userAgent: req.headers['user-agent'] || '',
-    signedAt: new Date()
+    signedAt: new Date(),
+    paymentState: 'pending',
+    paymentStateUpdatedAt: new Date(),
+    needsManualReview: false
   });
 
   return res.status(201).json({
@@ -152,6 +155,15 @@ export const createBeatCheckout = async (req, res) => {
     buyerEmail: buyerEmail || agreement.buyerEmail,
     agreementId
   });
+
+  agreement.stripeCheckoutSessionId = session.id;
+  agreement.stripePaymentIntentId = '';
+  agreement.stripeChargeId = '';
+  agreement.orderId = null;
+  agreement.paymentState = 'pending';
+  agreement.paymentStateUpdatedAt = new Date();
+  agreement.needsManualReview = false;
+  await agreement.save();
 
   return res.status(200).json({ checkoutUrl: session.url, sessionId: session.id });
 };
@@ -234,6 +246,7 @@ export const getCheckoutStatus = async (req, res) => {
       amountTaxCents: order.amountTax,
       currency: String(order.currency || 'usd').toUpperCase(),
       paymentStatus: order.paymentStatus,
+      stripePaymentState: order.stripePaymentState || order.paymentStatus,
       fulfillmentStatus: order.fulfillmentStatus,
       buyerEmailMasked: maskEmail(order.buyerEmail),
       createdAt: order.createdAt,

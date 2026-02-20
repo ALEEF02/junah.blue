@@ -3,6 +3,33 @@ import Beat from '../models/Beat.js';
 import Order from '../models/Order.js';
 import SignedAgreement from '../models/SignedAgreement.js';
 import { uploadBeatBuffer } from '../services/s3Service.js';
+import { syncRecentOrdersFromStripe } from '../services/stripeSyncService.js';
+import { PAID_LIKE_ORDER_STATES } from '../services/paymentStateService.js';
+
+const parseBooleanQuery = (value, fallback) => {
+  if (value === undefined) return fallback;
+  return ['1', 'true', 'yes', 'on'].includes(String(value).toLowerCase());
+};
+
+const parseLimit = (value, fallback = 250) => {
+  const parsed = Number(value || fallback);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(Math.max(parsed, 1), 500);
+};
+
+const paidContractFilter = {
+  $or: [
+    { paymentState: { $in: ['paid', 'partially_refunded', 'chargeback_won'] } },
+    { paymentState: { $exists: false }, orderId: { $ne: null } }
+  ]
+};
+
+const paidOrderFilter = {
+  $or: [
+    { stripePaymentState: { $in: PAID_LIKE_ORDER_STATES } },
+    { stripePaymentState: { $exists: false }, paymentStatus: 'paid' }
+  ]
+};
 
 export const getOwnerBeats = async (_req, res) => {
   const beats = await Beat.find().sort({ createdAt: -1 }).lean();
@@ -69,15 +96,38 @@ export const uploadOwnerBeatFiles = async (req, res) => {
   });
 };
 
-export const getOwnerOrders = async (_req, res) => {
-  const orders = await Order.find().sort({ createdAt: -1 }).limit(250).lean();
+export const getOwnerOrders = async (req, res) => {
+  const sync = parseBooleanQuery(req.query.sync, true);
+  const limit = parseLimit(req.query.limit, 250);
+
+  if (sync) {
+    await syncRecentOrdersFromStripe({ limit });
+  }
+
+  const orders = await Order.find().sort({ createdAt: -1 }).limit(limit).lean();
   return res.status(200).json({ orders });
 };
 
-export const getOwnerContracts = async (_req, res) => {
-  const contracts = await SignedAgreement.aggregate([
+export const getOwnerContracts = async (req, res) => {
+  const sync = parseBooleanQuery(req.query.sync, true);
+  const includeUnpaid = parseBooleanQuery(req.query.includeUnpaid, false);
+  const limit = parseLimit(req.query.limit, 250);
+
+  if (sync) {
+    await syncRecentOrdersFromStripe({ limit });
+  }
+
+  const pipeline = [];
+
+  if (!includeUnpaid) {
+    pipeline.push({
+      $match: paidContractFilter
+    });
+  }
+
+  pipeline.push(
     { $sort: { createdAt: -1 } },
-    { $limit: 250 },
+    { $limit: limit },
     {
       $lookup: {
         from: 'beats',
@@ -98,21 +148,29 @@ export const getOwnerContracts = async (_req, res) => {
         beat: 0
       }
     }
-  ]);
+  );
+
+  const contracts = await SignedAgreement.aggregate(pipeline);
 
   return res.status(200).json({
     contracts
   });
 };
 
-export const getOwnerOverview = async (_req, res) => {
+export const getOwnerOverview = async (req, res) => {
+  const sync = parseBooleanQuery(req.query.sync, true);
+
+  if (sync) {
+    await syncRecentOrdersFromStripe({ limit: 250 });
+  }
+
   const [totalBeats, activeBeats, totalOrders, agreements, revenueAgg] = await Promise.all([
     Beat.countDocuments({}),
     Beat.countDocuments({ isActive: true }),
-    Order.countDocuments({ paymentStatus: 'paid' }),
-    SignedAgreement.countDocuments({}),
+    Order.countDocuments(paidOrderFilter),
+    SignedAgreement.countDocuments(paidContractFilter),
     Order.aggregate([
-      { $match: { paymentStatus: 'paid' } },
+      { $match: paidOrderFilter },
       { $group: { _id: null, revenue: { $sum: '$amountTotal' } } }
     ])
   ]);

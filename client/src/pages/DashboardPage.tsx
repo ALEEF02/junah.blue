@@ -24,14 +24,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
   const [beats, setBeats] = useState<OwnerBeat[]>([]);
   const [orders, setOrders] = useState<OwnerOrder[]>([]);
   const [contracts, setContracts] = useState<OwnerContract[]>([]);
+  const [includeUnpaidContracts, setIncludeUnpaidContracts] = useState(false);
+  const [syncingStripe, setSyncingStripe] = useState(false);
   const [beatForm, setBeatForm] = useState(initialBeatForm);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploadFiles, setUploadFiles] = useState<Record<string, { preview?: File; full?: File }>>({});
 
-  const loadData = async () => {
+  const loadData = async ({ sync = true, showLoader = true }: { sync?: boolean; showLoader?: boolean } = {}) => {
     try {
-      setLoading(true);
+      if (showLoader) setLoading(true);
+      if (sync) setSyncingStripe(true);
       setError(null);
 
       const me = await api.getOwnerMe();
@@ -39,10 +42,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
       onAuthStateChange(me.user);
 
       const [overviewRes, beatsRes, ordersRes, contractsRes] = await Promise.all([
-        api.getOwnerOverview(),
+        api.getOwnerOverview({ sync }),
         api.getOwnerBeats(),
-        api.getOwnerOrders(),
-        api.getOwnerContracts()
+        api.getOwnerOrders({ sync, limit: 250 }),
+        api.getOwnerContracts({ sync, includeUnpaid: includeUnpaidContracts, limit: 250 })
       ]);
 
       setOverview(overviewRes.overview);
@@ -54,15 +57,35 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
       onAuthStateChange(null);
       setError(err instanceof Error ? err.message : 'Unable to load dashboard');
     } finally {
-      setLoading(false);
+      if (showLoader) setLoading(false);
+      if (sync) setSyncingStripe(false);
     }
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData({ sync: true, showLoader: true });
+  }, [includeUnpaidContracts]);
 
   const revenue = useMemo(() => formatCurrency(overview?.grossRevenueCents || 0), [overview]);
+
+  const shortId = (value?: string | null) => {
+    if (!value) return 'N/A';
+    if (value.length <= 18) return value;
+    return `${value.slice(0, 10)}...${value.slice(-6)}`;
+  };
+
+  const stateBadgeClass = (state = '') => {
+    if (['paid', 'partially_refunded', 'chargeback_won'].includes(state)) {
+      return 'border-emerald-300 bg-emerald-50 text-emerald-800';
+    }
+    if (['failed', 'refunded', 'canceled', 'chargeback_lost'].includes(state)) {
+      return 'border-red-300 bg-red-50 text-red-700';
+    }
+    if (state === 'disputed') {
+      return 'border-amber-300 bg-amber-50 text-amber-800';
+    }
+    return 'border-slate-300 bg-slate-50 text-slate-700';
+  };
 
   const createBeat = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -84,7 +107,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
       });
 
       setBeatForm(initialBeatForm);
-      await loadData();
+      await loadData({ sync: false, showLoader: false });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to create beat');
     }
@@ -93,7 +116,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
   const patchBeat = async (beatId: string, payload: Partial<OwnerBeat>) => {
     try {
       await api.updateOwnerBeat(beatId, payload);
-      await loadData();
+      await loadData({ sync: false, showLoader: false });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to update beat');
     }
@@ -105,7 +128,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
     try {
       await api.uploadBeatFiles(beatId, files);
       setUploadFiles((current) => ({ ...current, [beatId]: {} }));
-      await loadData();
+      await loadData({ sync: false, showLoader: false });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed');
     }
@@ -129,6 +152,19 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-10 md:px-6">
       <SectionHeader eyebrow="Producer" title="Dashboard" description="Manage beats, uploads, pricing, signed agreements, and orders." />
+
+      <div className="flex flex-wrap items-center justify-between gap-3 border border-slate-300 bg-white p-3 text-sm">
+        <p className="text-slate-700">
+          Stripe Sync: {syncingStripe ? <span className="text-violet-700">Refreshing...</span> : <span className="text-emerald-700">Up to date</span>}
+        </p>
+        <button
+          onClick={() => loadData({ sync: true, showLoader: false })}
+          disabled={syncingStripe}
+          className="rounded-full border border-slate-400 bg-lime-300 px-4 py-1.5 text-slate-900 hover:bg-lime-200 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {syncingStripe ? 'Syncing Stripe...' : 'Sync from Stripe now'}
+        </button>
+      </div>
 
       {error ? <p className="rounded border border-red-300 bg-red-50 p-3 text-red-700">{error}</p> : null}
 
@@ -278,20 +314,57 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
           <div className="mt-3 space-y-2">
             {orders.slice(0, 12).map((order) => (
               <div key={order._id} className="border border-slate-200 p-2 text-sm">
-                <p className="text-slate-900">{order.type.toUpperCase()} - {formatCurrency(order.amountTotal)}</p>
-                <p className="text-slate-600">{order.buyerEmail} | {order.paymentStatus} | Order {order.fulfillmentStatus} | {new Date(order.createdAt).toLocaleString()}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-slate-900">{order.type.toUpperCase()} - {formatCurrency(order.amountTotal)}</p>
+                  <span className={`rounded border px-2 py-0.5 text-xs ${stateBadgeClass(order.stripePaymentState || order.paymentStatus)}`}>
+                    {(order.stripePaymentState || order.paymentStatus || 'pending').replaceAll('_', ' ')}
+                  </span>
+                </div>
+                <p className="mt-1 text-slate-600">
+                  {order.buyerEmail} | Payment {order.paymentStatus} | Order {order.fulfillmentStatus}
+                </p>
+                <p className="text-slate-600">
+                  Refund {formatCurrency(order.amountRefunded || 0)} | Dispute {order.stripeDisputeStatus || 'none'}
+                  {order.needsManualReview ? ' | Manual review required' : ''}
+                </p>
+                <p className="font-mono text-xs text-slate-500">
+                  _id {shortId(order._id)} | Session {shortId(order.stripeCheckoutSessionId)}<br/>PI {shortId(order.stripePaymentIntentId)} | Ch {shortId(order.stripeChargeId)}
+                </p>
+                <p className="text-xs text-slate-500">{new Date(order.createdAt).toLocaleString()}</p>
               </div>
             ))}
           </div>
         </article>
 
         <article className="border border-slate-500 bg-white p-4">
-          <h3 className="font-mono text-2xl text-slate-900">Signed Contracts</h3>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="font-mono text-2xl text-slate-900">Signed Contracts</h3>
+            <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                checked={includeUnpaidContracts}
+                onChange={(e) => setIncludeUnpaidContracts(e.target.checked)}
+              />
+              <span>Include unpaid signatures</span>
+            </label>
+          </div>
           <div className="mt-3 space-y-2">
             {contracts.slice(0, 12).map((contract) => (
               <div key={contract._id} className="border border-slate-200 p-2 text-sm">
-                <p className="text-slate-900">{contract.templateType.toUpperCase()} with {contract.buyerName}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-slate-900">{contract.templateType.toUpperCase()} with {contract.buyerName}</p>
+                  <span className={`rounded border px-2 py-0.5 text-xs ${stateBadgeClass(contract.paymentState)}`}>
+                    {(contract.paymentState || 'pending').replaceAll('_', ' ')}
+                  </span>
+                </div>
                 <p className="text-slate-700">Beat: {contract.beatTitle || 'Unknown Beat'}</p>
+                <p className="font-mono text-xs text-slate-500">
+                  Session {shortId(contract.stripeCheckoutSessionId)} | PI {shortId(contract.stripePaymentIntentId)}
+                </p>
+                <p className="text-slate-600">
+                  {contract.needsManualReview ? 'Manual review required | ' : ''}
+                  {contract.orderId ? `Order linked ${shortId(contract.orderId)}` : 'No paid order linked'}
+                </p>
                 <p className="text-slate-600">{contract.buyerEmail} | {new Date(contract.signedAt).toLocaleString()}</p>
               </div>
             ))}

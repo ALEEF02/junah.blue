@@ -151,6 +151,12 @@ const handleApparelCheckoutCompleted = async (session) => {
     lineItems
   });
 
+  if (!session.livemode) {
+    order.fulfillmentStatus = 'not-applicable';
+    await order.save();
+    return;
+  }
+
   try {
     const printifyOrder = await createPrintifyOrder({
       sessionId: session.id,

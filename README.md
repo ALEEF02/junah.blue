@@ -86,6 +86,59 @@ npm start
    ```
 4. Add TLS certificates (Certbot or your preferred ACME flow) and map them to the Nginx container.
 
+## DigitalOcean App Platform Deployment (GHCR Images)
+
+This repo now includes CI workflows to build/test frontend + backend and publish Docker images to GitHub Container Registry (GHCR):
+
+- `.github/workflows/build-frontend.yaml`
+- `.github/workflows/build-backend.yaml`
+- `.github/workflows/docker.yaml`
+
+Published image names:
+
+- `ghcr.io/<github-owner>/junah-blue-frontend:latest`
+- `ghcr.io/<github-owner>/junah-blue-backend:latest`
+
+### 1. Push to `main` to publish images
+
+`docker.yaml` runs on every push to `main` and pushes both images to GHCR using `GITHUB_TOKEN`.
+
+### 2. Make GHCR images readable by DigitalOcean
+
+If your GHCR packages are private, create a GitHub Personal Access Token (classic) with at least:
+
+- `read:packages`
+
+Then use that credential in DigitalOcean when connecting GHCR.
+
+### 3. App Specs with env mapping
+
+Two App Platform specs are included:
+
+- `deploy/digitalocean/frontend-app.yaml`
+- `deploy/digitalocean/backend-app.yaml`
+
+They include all required runtime env vars from `.env.example`, so backend/frontend startup is compatible with current config.
+
+Before deploying, update:
+
+- `image.repository` in both files (replace `your-github-username`)
+- all `replace-with-*` env placeholders
+
+### 4. Deploy using `doctl` (optional)
+
+```bash
+doctl apps create --spec deploy/digitalocean/frontend-app.yaml
+doctl apps create --spec deploy/digitalocean/backend-app.yaml
+```
+
+For updates:
+
+```bash
+doctl apps update <frontend-app-id> --spec deploy/digitalocean/frontend-app.yaml
+doctl apps update <backend-app-id> --spec deploy/digitalocean/backend-app.yaml
+```
+
 ## Bootstrapping
 
 On backend startup, bootstrap creates:

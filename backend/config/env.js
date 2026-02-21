@@ -12,6 +12,8 @@ export const env = {
   PORT: Number(process.env.PORT || 5000),
   FRONTEND_ORIGIN: process.env.FRONTEND_ORIGIN || 'http://localhost:3000',
   MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/junah_blue',
+  MONGODB_USERNAME: process.env.MONGODB_USERNAME || '',
+  MONGODB_PASSWORD: process.env.MONGODB_PASSWORD || '',
   JWT_SECRET: process.env.JWT_SECRET || 'dev-jwt-secret-change-me',
   OWNER_EMAIL: process.env.OWNER_EMAIL || 'owner@junah.blue',
   OWNER_PASSWORD: process.env.OWNER_PASSWORD || '',

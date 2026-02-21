@@ -166,6 +166,8 @@ npm run backfill:payments
 See `.env.example` for full list.
 
 - `MONGODB_URI`
+- `MONGODB_USERNAME`
+- `MONGODB_PASSWORD`
 - `JWT_SECRET`
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`

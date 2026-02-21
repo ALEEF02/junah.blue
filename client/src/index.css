@@ -1,3 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@300;400;600&family=Source+Sans+3:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --bg-main: #efefec;
+  --text-main: #303642;
+  --accent-violet: #5f2fff;
+  --accent-green: #84ef78;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-family: 'Source Sans 3', sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Dosis', sans-serif;
+}
+
+.font-mono {
+  font-family: 'Space Mono', monospace;
+}

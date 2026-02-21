@@ -1,69 +1,62 @@
-version: '3.8'
-
 services:
-  # MongoDB Database
-  mongodb:
-    image: mongo:7.0
-    container_name: junah-mongodb-dev
+  mongo:
+    image: mongo:7
+    container_name: junah-mongo-dev
     restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password123
-      MONGO_INITDB_DATABASE: junah_beats_dev
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
-      - mongodb_dev_data:/data/db
+      - mongo_data:/data/db
     networks:
       - junah-dev-network
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
-  # Backend API (Development)
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: junah-backend-dev
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       NODE_ENV: development
       PORT: 5000
-      MONGODB_URI: mongodb://admin:password123@mongodb:27017/junah_beats_dev?authSource=admin
+      FRONTEND_ORIGIN: http://localhost:3000
+      MONGODB_URI: mongodb://mongo:27017/junah_blue
     ports:
-      - "5000:5000"
+      - '5000:5000'
+    command: sh -c "npm install && npm run dev"
     depends_on:
-      mongodb:
-        condition: service_healthy
+      - mongo
     volumes:
       - ./backend:/app
       - backend_node_modules:/app/node_modules
     networks:
       - junah-dev-network
 
-  # Frontend React App (Development)
   frontend:
     build:
       context: ./client
       dockerfile: Dockerfile
     container_name: junah-frontend-dev
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       NODE_ENV: development
+      PORT: 3000
       REACT_APP_API_URL: http://localhost:5000
-      CHOKIDAR_USEPOLLING: "true"
-      WATCHPACK_POLLING: "true"
-      SKIP_PREFLIGHT_CHECK: "true"
+      CHOKIDAR_USEPOLLING: 'true'
+      WATCHPACK_POLLING: 'true'
+      SKIP_PREFLIGHT_CHECK: 'true'
       WDS_SOCKET_HOST: 0.0.0.0
       WDS_SOCKET_PORT: 3000
-      FAST_REFRESH: "false"
+      FAST_REFRESH: 'false'
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - backend
+    command: sh -c "npm install --legacy-peer-deps && npm start"
     volumes:
       - ./client:/app
       - frontend_node_modules:/app/node_modules
@@ -72,12 +65,26 @@ services:
     stdin_open: true
     tty: true
 
+  stripe-webhook:
+    image: stripe/stripe-cli:latest
+    container_name: junah-stripe-webhook-dev
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - backend
+    command: listen --forward-to http://backend:5000/api/webhooks/stripe --events checkout.session.completed,checkout.session.expired,checkout.session.async_payment_failed,payment_intent.payment_failed,payment_intent.canceled,charge.refunded,charge.dispute.created,charge.dispute.updated,charge.dispute.closed
+    volumes:
+      - ${HOME}/.config/stripe:/root/.config/stripe
+    networks:
+      - junah-dev-network
+
 volumes:
-  mongodb_dev_data:
-    driver: local
   backend_node_modules:
     driver: local
   frontend_node_modules:
+    driver: local
+  mongo_data:
     driver: local
 
 networks:

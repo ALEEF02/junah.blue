@@ -1,88 +1,135 @@
-# Junah Site
+# Junah.blue
 
-## Project Structure
+Full-stack marketplace for Junah beats, licensing contracts, and apparel.
 
+## Stack
+
+- Frontend: React + TypeScript + Tailwind + Framer Motion
+- Backend: Node.js + Express + MongoDB
+- Storage: AWS S3 (beat files + signed agreement PDFs)
+- Payments: Stripe Checkout + Stripe webhooks
+- Fulfillment: Printify API
+- Email: AWS SES
+
+## Required Pages
+
+- `/` Homepage (artist bio + featured beats/apparel)
+- `/apparel` Apparel storefront + checkout
+- `/beats` Beat marketplace + contract-gated checkout
+- `/dashboard` Producer dashboard (owner-only)
+- `/licensing` Legal resource center
+- `/login` Producer login
+
+## Quick Start (Docker)
+
+1. Copy `.env.example` to `.env` and fill credentials.
+2. Start services:
+   ```bash
+   docker-compose up --build
+   ```
+3. Open:
+   - Frontend: `http://localhost:3000`
+   - Backend: `http://localhost:5000`
+   - Health: `http://localhost:5000/api/health`
+   - Stripe webhook forwarder logs: `docker logs -f junah-stripe-webhook-dev`
+
+If dependencies changed and containers still fail with `ERR_MODULE_NOT_FOUND`, reset persistent dependency volumes and rebuild:
+
+```bash
+docker-compose down -v
+docker-compose up --build
 ```
-junah.blue/
-├── client/          # React frontend application
-├── backend/         # Express.js backend API
-└── docker-compose.yml
+
+## Stripe Webhook In Dev
+
+`docker-compose.yml` includes a `stripe-webhook` service that runs:
+
+```bash
+stripe listen --forward-to http://backend:5000/api/webhooks/stripe --events checkout.session.completed,checkout.session.expired,checkout.session.async_payment_failed,payment_intent.payment_failed,payment_intent.canceled,charge.refunded,charge.dispute.created,charge.dispute.updated,charge.dispute.closed
 ```
 
-## Prerequisites
+One-time setup on your machine:
 
-- Node.js
-- npm
-- Docker and Docker Compose
-- MongoDB (if running locally without Docker)
-
-## Setup
-
-### Docker Setup
-
-This will run the entire stack in docker:
-
-1. **Clone the repository**
+1. Authenticate Stripe CLI config (creates `~/.config/stripe`):
    ```bash
-   git clone <repository-url>
-   cd junah.blue
+   docker run -v ~/.config/stripe:/root/.config/stripe -it stripe/stripe-cli:latest login
    ```
+2. Set `STRIPE_WEBHOOK_SECRET` in `.env` to the signing secret printed by the running webhook listener.
 
-2. **Start the application**
+## Local Development
+
+### Backend
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+### Frontend
+
+```bash
+cd client
+npm install
+npm start
+```
+
+## VPS Deployment (Single Server + Nginx)
+
+1. Copy `.env.example` to `.env` and set production values (`FRONTEND_ORIGIN=https://junah.blue`, `REACT_APP_API_URL=https://api.junah.blue`).
+2. Use deployment files in `deploy/`:
+   - `deploy/docker-compose.prod.yml`
+   - `deploy/nginx.conf`
+3. Run from `deploy/`:
    ```bash
-   docker-compose up -d
+   docker compose -f docker-compose.prod.yml up --build -d
    ```
+4. Add TLS certificates (Certbot or your preferred ACME flow) and map them to the Nginx container.
 
-3. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:3001
-   - MongoDB: mongodb://localhost:27017
+## Bootstrapping
 
-4. **Stop the application**
-   ```bash
-   docker-compose down
-   ```
+On backend startup, bootstrap creates:
 
-### Local Development Setup
+- Owner account (if `OWNER_PASSWORD` or `OWNER_PASSWORD_HASH` is provided)
+- Default artist profile
+- Starter contract templates (`exclusive`, `non-exclusive`, `split`)
 
-#### Backend Setup
+Run explicitly:
 
-1. **Navigate to backend directory**
-   ```bash
-   cd backend
-   ```
+```bash
+cd backend
+npm run seed
+```
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+Backfill payment state fields for existing documents:
 
-3. **Start MongoDB** (if not using Docker)
-   - Install MongoDB locally or use MongoDB Atlas
-   - Update connection string in `backend/dbConfig/settings.js`
+```bash
+cd backend
+npm run backfill:payments
+```
 
-4. **Start the backend server**
-   ```bash
-   npm run dev
-   ```
+## Important Environment Variables
 
-   Server will start on http://localhost:3001
+See `.env.example` for full list.
 
-#### Frontend Setup
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `AWS_REGION`
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `S3_BUCKET_BEATS`
+- `S3_BUCKET_CONTRACTS`
+- `SES_FROM_EMAIL`
+- `PRINTIFY_API_TOKEN`
+- `PRINTIFY_SHOP_ID`
+- `OWNER_EMAIL`
+- `OWNER_PASSWORD` or `OWNER_PASSWORD_HASH`
 
-1. **Navigate to client directory**
-   ```bash
-   cd client
-   ```
+## API Groups
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**
-   ```bash
-   npm start
-   ```
-
-   Application will open on http://localhost:3000
+- Public: `/api/public/*`
+- Auth: `/api/auth/*`
+- Owner: `/api/owner/*`
+- Stripe webhook: `/api/webhooks/stripe`

@@ -147,7 +147,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           {apparel.map((product, index) => (
             <EditorialCard
               key={product.id}
-              category="Printify"
+              category="Product"
               title={product.title}
               description={
                 product.variants[0]

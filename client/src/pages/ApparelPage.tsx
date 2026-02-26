@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { colornames } from 'color-name-list';
 import { api, formatCurrency } from '../lib/api';
 import { savePendingCheckout } from '../lib/checkoutFeedback';
 import { ApparelProduct } from '../types/api';
@@ -13,6 +14,96 @@ interface CartItem {
 }
 
 const stripeColors = ['#111827', '#2563eb', '#22d3ee', '#f43f5e', '#f59e0b', '#84cc16'];
+const MAX_STRIPE_SEGMENTS = 10;
+
+const normalizeColorText = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/\/.*/g, ' ')
+    .replace(/[^a-z\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+const namedColorEntries = (colornames as Array<{ name: string; hex: string }>)
+  .map((entry) => ({
+    normalizedName: normalizeColorText(entry.name),
+    hex: entry.hex.toLowerCase()
+  }))
+  .filter((entry): entry is { normalizedName: string; hex: string } => Boolean(entry.normalizedName && entry.hex));
+
+const isWholeWordMatch = (title: string, match: string, startIndex: number) => {
+  const before = startIndex === 0 || title[startIndex - 1] === ' ';
+  const endIndex = startIndex + match.length;
+  const after = endIndex === title.length || title[endIndex] === ' ';
+  return before && after;
+};
+
+const pickBestColorMatch = (
+  normalizedTitle: string,
+  options: Array<{ normalizedName: string; hex: string; index: number; wholeWord: boolean }>
+) => {
+  if (options.length === 0) return null;
+
+  // 1) Exact match
+  const exactMatch = options.find((option) => option.normalizedName === normalizedTitle);
+  if (exactMatch) return exactMatch;
+
+  // 2) First whole-word match
+  const firstWholeWord = options.find((option) => option.wholeWord);
+  if (firstWholeWord) return firstWholeWord;
+
+  // 3) Most letters
+  return options.reduce((best, current) =>
+    current.normalizedName.length > best.normalizedName.length ? current : best
+  );
+};
+
+const extractStripeColors = (product: ApparelProduct) => {
+  const foundColors: string[] = [];
+
+  console.log("Colors for " + product.title);
+
+  product.variants.forEach((variant) => {
+    const normalizedTitle = normalizeColorText(variant.title);
+    console.log("\t" + variant.title + " --> " + normalizedTitle);
+
+    const options = namedColorEntries
+      .map((entry) => {
+        const index = normalizedTitle.indexOf(entry.normalizedName);
+        if (index === -1) return null;
+
+        return {
+          ...entry,
+          index,
+          wholeWord: isWholeWordMatch(normalizedTitle, entry.normalizedName, index)
+        };
+      })
+      .filter(
+        (
+          entry
+        ): entry is {
+          normalizedName: string;
+          hex: string;
+          index: number;
+          wholeWord: boolean;
+        } => Boolean(entry)
+      );
+
+    const selected = pickBestColorMatch(normalizedTitle, options);
+    if (selected && !foundColors.includes(selected.hex)) {
+      console.log("\t" + selected.normalizedName);
+      foundColors.push(selected.hex);
+    }
+  });
+
+  const palette = foundColors.length > 0 ? foundColors : stripeColors;
+  const expanded: string[] = [];
+
+  while (expanded.length < MAX_STRIPE_SEGMENTS && expanded.length < palette.length) {
+    expanded.push(palette[expanded.length]);
+  }
+
+  return expanded;
+};
 
 export const ApparelPage: React.FC = () => {
   const [products, setProducts] = useState<ApparelProduct[]>([]);
@@ -48,6 +139,14 @@ export const ApparelPage: React.FC = () => {
   const cartTotal = useMemo(
     () => cart.reduce((sum, item) => sum + item.amountCents * item.quantity, 0),
     [cart]
+  );
+  const productStripeColors = useMemo(
+    () =>
+      products.reduce<Record<string, string[]>>((acc, product) => {
+        acc[product.id] = extractStripeColors(product);
+        return acc;
+      }, {}),
+    [products]
   );
 
   const addToCart = (product: ApparelProduct) => {
@@ -131,14 +230,14 @@ export const ApparelPage: React.FC = () => {
       <SectionHeader
         eyebrow="Merch"
         title="Apparel"
-        description="Browse live Printify inventory and complete checkout directly on Junah.blue."
+        description="Browse live apparel inventory and complete checkout directly on Junah.blue."
       />
 
       {error ? <p className="rounded border border-red-300 bg-red-50 p-3 text-red-700">{error}</p> : null}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {products.map((product, index) => {
+          {products.map((product) => {
             const selectedVariant =
               product.variants.find((entry) => String(entry.id) === String(variantSelection[product.id])) ||
               product.variants[0];
@@ -148,8 +247,12 @@ export const ApparelPage: React.FC = () => {
                 <div className="border-b border-slate-300 p-3">
                   <p className="font-semibold text-slate-900">{selectedVariant?.title || 'Variant'}</p>
                   <div className="mt-2 flex gap-1">
-                    {stripeColors.map((color) => (
-                      <div key={`${product.id}-${color}`} style={{ backgroundColor: color }} className="h-1 w-full" />
+                    {(productStripeColors[product.id] || stripeColors).map((color, stripeIndex) => (
+                      <div
+                        key={`${product.id}-${color}-${stripeIndex}`}
+                        style={{ backgroundColor: color }}
+                        className="h-1 w-full"
+                      />
                     ))}
                   </div>
                 </div>

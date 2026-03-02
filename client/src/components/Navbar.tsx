@@ -4,6 +4,7 @@ import { Menu, X, Search, Sparkles } from 'lucide-react';
 interface NavItem {
   label: string;
   path: string;
+  owner: boolean;
 }
 
 interface NavbarProps {
@@ -14,11 +15,11 @@ interface NavbarProps {
 }
 
 const navItems: NavItem[] = [
-  { label: 'HOME', path: '/' },
-  { label: 'BEATS', path: '/beats' },
-  { label: 'APPAREL', path: '/apparel' },
-  { label: 'LICENSING', path: '/licensing' },
-  { label: 'DASHBOARD', path: '/dashboard' }
+  { label: 'HOME', path: '/', owner: false},
+  { label: 'BEATS', path: '/beats', owner: false },
+  { label: 'APPAREL', path: '/apparel', owner: false },
+  { label: 'LICENSING', path: '/licensing', owner: false },
+  { label: 'DASHBOARD', path: '/dashboard', owner: true } 
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({ path, onNavigate, isOwnerAuthed, onLogout }) => {
@@ -50,7 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({ path, onNavigate, isOwnerAuthed,
           <nav className="hidden items-center gap-6 md:flex">
             {navItems.map((item) => {
               const active = path === item.path;
-              return (
+              return (!item.owner || (item.owner && isOwnerAuthed)) && (
                 <button
                   key={item.path}
                   onClick={() => onNavigate(item.path)}
@@ -70,12 +71,14 @@ export const Navbar: React.FC<NavbarProps> = ({ path, onNavigate, isOwnerAuthed,
             >
               <Search className="h-5 w-5" />
             </button>
-            <button
-              onClick={handleCta}
-              className="rounded-full border border-slate-400 bg-lime-300 px-6 py-2 text-lg text-slate-800 transition hover:-translate-y-0.5 hover:bg-lime-200"
-            >
-              {ctaLabel}
-            </button>
+            {isOwnerAuthed && (
+              <button
+                onClick={handleCta}
+                className="rounded-full border border-slate-400 bg-lime-300 px-6 py-2 text-lg text-slate-800 transition hover:-translate-y-0.5 hover:bg-lime-200"
+              >
+                {ctaLabel}
+              </button>
+            )}
           </div>
 
           <button
@@ -101,9 +104,11 @@ export const Navbar: React.FC<NavbarProps> = ({ path, onNavigate, isOwnerAuthed,
                 {item.label}
               </button>
             ))}
-            <button onClick={handleCta} className="mt-2 w-full rounded-full bg-lime-300 px-4 py-2 text-slate-900">
-              {ctaLabel}
-            </button>
+            {isOwnerAuthed && (
+              <button onClick={handleCta} className="mt-2 w-full rounded-full bg-lime-300 px-4 py-2 text-slate-900">
+                {ctaLabel}
+              </button>
+            )}
           </div>
         )}
       </div>

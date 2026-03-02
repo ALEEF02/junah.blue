@@ -6,7 +6,11 @@ import { SectionHeader } from '../components/SectionHeader';
 import { AudioPreviewPlayer } from '../components/AudioPreviewPlayer';
 import { ContractModal } from '../components/ContractModal';
 
-export const BeatsPage: React.FC = () => {
+interface BeatsPageProps {
+  onNavigate: (path: string) => void;
+}
+
+export const BeatsPage: React.FC<BeatsPageProps> = ({ onNavigate }) => {
   const [beats, setBeats] = useState<Beat[]>([]);
   const [templates, setTemplates] = useState<ContractTemplate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,17 +116,30 @@ export const BeatsPage: React.FC = () => {
       />
 
       {error ? <p className="rounded border border-red-300 bg-red-50 p-3 text-red-700">{error}</p> : null}
+      
+      <section className="mx-auto max-w-6xl border border-brand-mid bg-brand-light/10 px-4 py-8 md:px-6">
+        <SectionHeader
+          eyebrow="Licensing"
+          title="Contract-first checkout"
+          description="Every beat purchase requires contract review and signature before Stripe payment checkout starts."
+        />
+        <div className="flex flex-wrap gap-3">
+          <button onClick={() => onNavigate('/licensing')} className="border border-brand-mid px-4 py-2 hover:bg-brand-light/20">
+            View License Hub
+          </button>
+        </div>
+      </section>
 
       <div className="grid gap-6 md:grid-cols-2">
         {beats.map((beat, idx) => {
           const selectedLicense = licenseByBeat[beat.id] || 'non-exclusive';
           return (
-            <article key={beat.id} className="border border-slate-600 bg-stone-100">
+            <article key={beat.id} className="border border-brand-mid bg-brand-cream">
               <div className="p-5">
-                <p className="text-xs uppercase tracking-[0.35em] text-slate-600">Beat #{idx + 1}</p>
-                <h3 className="mt-2 font-mono text-4xl text-slate-900">{beat.title}</h3>
-                <p className="mt-2 text-slate-700">{beat.description}</p>
-                <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-600">
+                <p className="text-xs uppercase tracking-[0.35em] text-brand-mid">Beat #{idx + 1}</p>
+                <h3 className="mt-2 font-mono text-4xl text-brand-dark">{beat.title}</h3>
+                <p className="mt-2 text-brand-mid">{beat.description}</p>
+                <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-brand-mid">
                   {beat.bpm ? <span>BPM {beat.bpm}</span> : null}
                   {beat.key ? <span>Key {beat.key}</span> : null}
                 </div>
@@ -131,10 +148,10 @@ export const BeatsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="border-t border-slate-400 bg-white p-5">
+              <div className="border-t border-brand-mid bg-brand-light/10 p-5">
                 <div className="grid gap-3 md:grid-cols-2">
                   <label className="block text-sm">
-                    <span className="mb-1 block uppercase tracking-[0.2em] text-slate-600">License</span>
+                    <span className="mb-1 block uppercase tracking-[0.2em] text-brand-mid">License</span>
                     <select
                       value={selectedLicense}
                       onChange={(e) =>
@@ -143,7 +160,7 @@ export const BeatsPage: React.FC = () => {
                           [beat.id]: e.target.value as LicenseType
                         }))
                       }
-                      className="w-full border border-slate-400 bg-stone-100 px-3 py-2"
+                      className="w-full border border-brand-mid bg-brand-cream px-3 py-2"
                     >
                       <option value="non-exclusive">Non-exclusive ({formatCurrency(beat.pricing.nonExclusivePriceCents)})</option>
                       <option value="exclusive" disabled={!beat.isAvailable}>
@@ -155,7 +172,7 @@ export const BeatsPage: React.FC = () => {
                   <div className="flex items-end">
                     <button
                       onClick={() => openContractModal(beat)}
-                      className="w-full rounded-full border border-slate-400 bg-lime-300 px-4 py-2 text-slate-900 transition hover:bg-lime-200"
+                      className="w-full rounded-full border border-brand-mid bg-brand-mid px-4 py-2 text-brand-cream transition hover:bg-brand-dark"
                     >
                       Review Contract and Buy
                     </button>
@@ -166,6 +183,10 @@ export const BeatsPage: React.FC = () => {
           );
         })}
       </div>
+
+      <p className="text-center text-sm text-brand-mid">
+        Inquire about songwriting services: junahblue@gmail.com
+      </p>
 
       <ContractModal
         isOpen={Boolean(selectedBeat)}

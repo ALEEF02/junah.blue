@@ -68,15 +68,15 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto bg-slate-950/50 px-4 py-8">
-      <div className="mx-auto max-w-3xl border border-slate-500 bg-stone-100 p-5 md:p-8">
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-brand-dark/50 px-4 py-8 !mt-0">
+      <div className="mx-auto max-w-3xl border border-brand-mid bg-brand-cream p-5 md:p-8">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-violet-600">Contract Required</p>
-            <h3 className="mt-1 font-mono text-3xl text-slate-900">{beat.title}</h3>
-            <p className="mt-1 text-slate-700">License type: {licenseType}</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-brand-mid">Contract Required</p>
+            <h3 className="mt-1 font-mono text-3xl text-brand-dark">{beat.title}</h3>
+            <p className="mt-1 text-brand-mid">License type: {licenseType}</p>
           </div>
-          <button onClick={onClose} className="border border-slate-400 p-2 text-slate-700 hover:text-slate-950" aria-label="Close contract dialog">
+          <button onClick={onClose} className="border border-brand-mid p-2 text-brand-mid hover:text-brand-dark" aria-label="Close contract dialog">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -84,54 +84,54 @@ export const ContractModal: React.FC<ContractModalProps> = ({
         <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
           <div className="grid gap-4 md:grid-cols-2">
             <label className="block">
-              <span className="mb-1 block text-sm uppercase tracking-[0.2em] text-slate-600">Full Name</span>
+              <span className="mb-1 block text-sm uppercase tracking-[0.2em] text-brand-mid">Full Name</span>
               <input
                 required
                 value={buyerName}
                 onChange={(e) => setBuyerName(e.target.value)}
-                className="w-full border border-slate-400 bg-white px-3 py-2"
+                className="w-full border border-brand-mid bg-brand-light/10 px-3 py-2"
               />
             </label>
             <label className="block">
-              <span className="mb-1 block text-sm uppercase tracking-[0.2em] text-slate-600">Email</span>
+              <span className="mb-1 block text-sm uppercase tracking-[0.2em] text-brand-mid">Email</span>
               <input
                 required
                 type="email"
                 value={buyerEmail}
                 onChange={(e) => setBuyerEmail(e.target.value)}
-                className="w-full border border-slate-400 bg-white px-3 py-2"
+                className="w-full border border-brand-mid bg-brand-light/10 px-3 py-2"
               />
             </label>
           </div>
 
-          <section className="border border-slate-400 p-4">
-            <h4 className="font-semibold text-slate-900">Summary / TLDR</h4>
-            <p className="mt-2 text-slate-700">{template?.summaryText || 'No summary available.'}</p>
-            <label className="mt-3 flex items-start gap-2 text-sm text-slate-700">
+          <section className="border border-brand-mid p-4">
+            <h4 className="font-semibold text-brand-dark">Summary / TLDR</h4>
+            <p className="mt-2 text-brand-mid">{template?.summaryText || 'No summary available.'}</p>
+            <label className="mt-3 flex items-start gap-2 text-sm text-brand-mid">
               <input type="checkbox" checked={acceptSummary} onChange={(e) => setAcceptSummary(e.target.checked)} className="mt-1" />
               <span>I have read and accepted the summary.</span>
             </label>
           </section>
 
-          <section className="border border-slate-400 p-4">
-            <h4 className="font-semibold text-slate-900">Full Contract</h4>
-            <div className="mt-2 max-h-52 overflow-y-auto whitespace-pre-wrap border border-slate-300 bg-white p-3 text-sm text-slate-700">
+          <section className="border border-brand-mid p-4">
+            <h4 className="font-semibold text-brand-dark">Full Contract</h4>
+            <div className="mt-2 max-h-52 overflow-y-auto whitespace-pre-wrap border border-brand-mid bg-brand-light/10 p-3 text-sm text-brand-mid">
               {template?.fullText || 'No contract text available.'}
             </div>
-            <label className="mt-3 flex items-start gap-2 text-sm text-slate-700">
+            <label className="mt-3 flex items-start gap-2 text-sm text-brand-mid">
               <input type="checkbox" checked={acceptFullTerms} onChange={(e) => setAcceptFullTerms(e.target.checked)} className="mt-1" />
               <span>I have read and accepted the full contract terms.</span>
             </label>
           </section>
 
           <label className="block">
-            <span className="mb-1 block text-sm uppercase tracking-[0.2em] text-slate-600">Typed Signature</span>
+            <span className="mb-1 block text-sm uppercase tracking-[0.2em] text-brand-mid">Typed Signature</span>
             <input
               required
               value={typedSignature}
               onChange={(e) => setTypedSignature(e.target.value)}
               placeholder="Type your full legal name"
-              className="w-full border border-slate-400 bg-white px-3 py-2"
+              className="w-full border border-brand-mid bg-brand-light/10 px-3 py-2"
             />
           </label>
 
@@ -140,7 +140,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full rounded-full border border-slate-400 bg-lime-300 px-5 py-3 text-lg text-slate-900 transition hover:bg-lime-200 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-full border border-brand-mid bg-brand-mid px-5 py-3 text-lg text-brand-cream transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? 'Preparing Checkout...' : 'Sign Contract and Continue to Payment'}
           </button>

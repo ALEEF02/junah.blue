@@ -6,9 +6,10 @@
 
 :root {
   --bg-main: #efefec;
-  --text-main: #303642;
-  --accent-violet: #5f2fff;
-  --accent-green: #84ef78;
+  --text-main: #030A3F;
+  --brand-dark: #030A3F;
+  --brand-mid: #406995;
+  --brand-light: #7FC6EB;
 }
 
 html,

@@ -16,16 +16,16 @@ export const EditorialCard: React.FC<EditorialCardProps> = ({
   title,
   description,
   imageUrl,
-  accent = 'text-violet-600',
+  accent = 'text-brand-mid',
   actions,
   onArrowClick
 }) => {
   return (
-    <article className="border border-slate-600 bg-stone-100">
+    <article className="border border-brand-mid bg-brand-cream">
       <div className="p-4">
-        <p className="text-xs uppercase tracking-[0.35em] text-slate-600">{category}</p>
-        <h3 className="mt-2 font-mono text-3xl leading-tight text-slate-800">{title}</h3>
-        {description ? <p className="mt-3 text-slate-700">{description}</p> : null}
+        <p className="text-xs uppercase tracking-[0.35em] text-brand-mid">{category}</p>
+        <h3 className="mt-2 font-mono text-3xl leading-tight text-brand-dark">{title}</h3>
+        {description ? <p className="mt-3 text-brand-mid">{description}</p> : null}
         {onArrowClick ? (
           <motion.button
             type="button"
@@ -43,7 +43,7 @@ export const EditorialCard: React.FC<EditorialCardProps> = ({
         )}
       </div>
       {imageUrl ? (
-        <div className="h-48 overflow-hidden border-y border-slate-300">
+        <div className="h-48 overflow-hidden border-y border-brand-mid">
           <img src={imageUrl} alt={title} className="h-full w-full object-cover" />
         </div>
       ) : null}

@@ -106,7 +106,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
     if (state === 'disputed') {
       return 'border-amber-300 bg-amber-50 text-amber-800';
     }
-    return 'border-slate-300 bg-slate-50 text-slate-700';
+    return 'border-brand-mid bg-brand-light/10 text-brand-mid';
   };
 
   const createBeat = async (event: React.FormEvent) => {
@@ -164,7 +164,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
     return (
       <div className="mx-auto max-w-3xl px-4 py-10 md:px-6">
         <SectionHeader eyebrow="Unauthorized" title="Producer Dashboard" description="Login is required to manage this account." />
-        <button onClick={() => onNavigate('/login')} className="rounded-full border border-slate-400 bg-lime-300 px-5 py-2 text-slate-900">
+        <button onClick={() => onNavigate('/login')} className="rounded-full border border-brand-mid bg-brand-mid px-5 py-2 text-brand-cream">
           Go to Login
         </button>
       </div>
@@ -175,14 +175,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-10 md:px-6">
       <SectionHeader eyebrow="Producer" title="Dashboard" description="Manage beats, uploads, pricing, signed agreements, and orders." />
 
-      <div className="flex flex-wrap items-center justify-between gap-3 border border-slate-300 bg-white p-3 text-sm">
-        <p className="text-slate-700">
-          Stripe Sync: {syncingStripe ? <span className="text-violet-700">Refreshing...</span> : <span className="text-emerald-700">Up to date</span>}
+      <div className="flex flex-wrap items-center justify-between gap-3 border border-brand-mid bg-brand-light/10 p-3 text-sm">
+        <p className="text-brand-mid">
+          Stripe Sync: {syncingStripe ? <span className="text-brand-light">Refreshing...</span> : <span className="text-emerald-700">Up to date</span>}
         </p>
         <button
           onClick={() => loadData({ sync: true, showLoader: false })}
           disabled={syncingStripe}
-          className="rounded-full border border-slate-400 bg-lime-300 px-4 py-1.5 text-slate-900 hover:bg-lime-200 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-full border border-brand-mid bg-brand-mid px-4 py-1.5 text-brand-cream hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
         >
           {syncingStripe ? 'Syncing Stripe...' : 'Sync from Stripe now'}
         </button>
@@ -191,56 +191,56 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
       {error ? <p className="rounded border border-red-300 bg-red-50 p-3 text-red-700">{error}</p> : null}
 
       <section className="grid gap-4 md:grid-cols-4">
-        <article className="border border-slate-400 bg-white p-4">
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-600">Total Beats</p>
-          <p className="mt-2 text-3xl text-slate-900">{overview?.totalBeats || 0}</p>
+        <article className="border border-brand-mid bg-brand-light/10 p-4">
+          <p className="text-xs uppercase tracking-[0.2em] text-brand-mid">Total Beats</p>
+          <p className="mt-2 text-3xl text-brand-dark">{overview?.totalBeats || 0}</p>
         </article>
-        <article className="border border-slate-400 bg-white p-4">
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-600">Active Beats</p>
-          <p className="mt-2 text-3xl text-slate-900">{overview?.activeBeats || 0}</p>
+        <article className="border border-brand-mid bg-brand-light/10 p-4">
+          <p className="text-xs uppercase tracking-[0.2em] text-brand-mid">Active Beats</p>
+          <p className="mt-2 text-3xl text-brand-dark">{overview?.activeBeats || 0}</p>
         </article>
-        <article className="border border-slate-400 bg-white p-4">
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-600">Paid Orders</p>
-          <p className="mt-2 text-3xl text-slate-900">{overview?.totalOrders || 0}</p>
+        <article className="border border-brand-mid bg-brand-light/10 p-4">
+          <p className="text-xs uppercase tracking-[0.2em] text-brand-mid">Paid Orders</p>
+          <p className="mt-2 text-3xl text-brand-dark">{overview?.totalOrders || 0}</p>
         </article>
-        <article className="border border-slate-400 bg-white p-4">
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-600">Gross Revenue</p>
-          <p className="mt-2 text-3xl text-slate-900">{revenue}</p>
+        <article className="border border-brand-mid bg-brand-light/10 p-4">
+          <p className="text-xs uppercase tracking-[0.2em] text-brand-mid">Gross Revenue</p>
+          <p className="mt-2 text-3xl text-brand-dark">{revenue}</p>
         </article>
       </section>
 
-      <section className="border border-slate-500 bg-white p-5">
-        <h3 className="font-mono text-3xl text-slate-900">Add Beat</h3>
+      <section className="border border-brand-mid bg-brand-light/10 p-5">
+        <h3 className="font-mono text-3xl text-brand-dark">Add Beat</h3>
         <form className="mt-4 grid gap-3 md:grid-cols-2" onSubmit={createBeat}>
           <input
             required
             placeholder="Title"
-            className="border border-slate-400 px-3 py-2"
+            className="border border-brand-mid px-3 py-2"
             value={beatForm.title}
             onChange={(e) => setBeatForm((current) => ({ ...current, title: e.target.value }))}
           />
           <input
             placeholder="Key"
-            className="border border-slate-400 px-3 py-2"
+            className="border border-brand-mid px-3 py-2"
             value={beatForm.key}
             onChange={(e) => setBeatForm((current) => ({ ...current, key: e.target.value }))}
           />
           <input
             placeholder="BPM"
-            className="border border-slate-400 px-3 py-2"
+            className="border border-brand-mid px-3 py-2"
             value={beatForm.bpm}
             onChange={(e) => setBeatForm((current) => ({ ...current, bpm: e.target.value }))}
           />
           <input
             placeholder="Tags (comma-separated)"
-            className="border border-slate-400 px-3 py-2"
+            className="border border-brand-mid px-3 py-2"
             value={beatForm.tags}
             onChange={(e) => setBeatForm((current) => ({ ...current, tags: e.target.value }))}
           />
           <input
             type="number"
             placeholder="Non-exclusive price (cents)"
-            className="border border-slate-400 px-3 py-2"
+            className="border border-brand-mid px-3 py-2"
             value={beatForm.nonExclusivePriceCents}
             onChange={(e) =>
               setBeatForm((current) => ({ ...current, nonExclusivePriceCents: e.target.value }))
@@ -249,51 +249,51 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
           <input
             type="number"
             placeholder="Exclusive price (cents)"
-            className="border border-slate-400 px-3 py-2"
+            className="border border-brand-mid px-3 py-2"
             value={beatForm.exclusivePriceCents}
             onChange={(e) => setBeatForm((current) => ({ ...current, exclusivePriceCents: e.target.value }))}
           />
           <textarea
             placeholder="Description"
-            className="border border-slate-400 px-3 py-2 md:col-span-2"
+            className="border border-brand-mid px-3 py-2 md:col-span-2"
             value={beatForm.description}
             onChange={(e) => setBeatForm((current) => ({ ...current, description: e.target.value }))}
           />
-          <button type="submit" className="md:col-span-2 rounded-full bg-lime-300 px-5 py-2 text-slate-900 hover:bg-lime-200">
+          <button type="submit" className="md:col-span-2 rounded-full bg-brand-mid px-5 py-2 text-brand-cream hover:bg-brand-dark">
             Create Beat
           </button>
         </form>
       </section>
 
       <section className="space-y-4">
-        <h3 className="font-mono text-3xl text-slate-900">Beat Inventory</h3>
+        <h3 className="font-mono text-3xl text-brand-dark">Beat Inventory</h3>
         {beats.map((beat) => (
-          <article key={beat._id} className="border border-slate-400 bg-white p-4">
+          <article key={beat._id} className="border border-brand-mid bg-brand-light/10 p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h4 className="text-2xl text-slate-900">{beat.title}</h4>
+              <h4 className="text-2xl text-brand-dark">{beat.title}</h4>
               <div className="flex gap-2">
                 <button
                   onClick={() => patchBeat(beat._id, { isAvailable: !beat.isAvailable })}
-                  className="border border-slate-400 px-3 py-1 text-sm hover:bg-slate-100"
+                  className="border border-brand-mid px-3 py-1 text-sm hover:bg-brand-light/20"
                 >
                   {beat.isAvailable ? 'Mark Unavailable' : 'Mark Available'}
                 </button>
                 <button
                   onClick={() => patchBeat(beat._id, { isActive: !beat.isActive })}
-                  className="border border-slate-400 px-3 py-1 text-sm hover:bg-slate-100"
+                  className="border border-brand-mid px-3 py-1 text-sm hover:bg-brand-light/20"
                 >
                   {beat.isActive ? 'Deactivate' : 'Activate'}
                 </button>
               </div>
             </div>
-            <p className="mt-2 text-slate-700">{beat.description}</p>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-brand-mid">{beat.description}</p>
+            <p className="mt-2 text-sm text-brand-mid">
               Non-exclusive {formatCurrency(beat.nonExclusivePriceCents)} | Exclusive {formatCurrency(beat.exclusivePriceCents)}
             </p>
 
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <label className="block text-sm">
-                <span className="mb-1 block uppercase tracking-[0.2em] text-slate-600">Preview File</span>
+                <span className="mb-1 block uppercase tracking-[0.2em] text-brand-mid">Preview File</span>
                 <input
                   type="file"
                   accept="audio/*"
@@ -306,7 +306,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
                 />
               </label>
               <label className="block text-sm">
-                <span className="mb-1 block uppercase tracking-[0.2em] text-slate-600">Full WAVE File</span>
+                <span className="mb-1 block uppercase tracking-[0.2em] text-brand-mid">Full WAVE File</span>
                 <input
                   type="file"
                   accept="audio/*"
@@ -322,7 +322,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
 
             <button
               onClick={() => submitUpload(beat._id)}
-              className="mt-3 rounded-full border border-slate-400 bg-lime-300 px-4 py-2 text-slate-900 hover:bg-lime-200"
+              className="mt-3 rounded-full border border-brand-mid bg-brand-mid px-4 py-2 text-brand-cream hover:bg-brand-dark"
             >
               Upload Files
             </button>
@@ -331,37 +331,37 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
       </section>
 
       <section className="grid gap-6 md:grid-cols-2">
-        <article className="border border-slate-500 bg-white p-4">
-          <h3 className="font-mono text-2xl text-slate-900">Recent Orders</h3>
+        <article className="border border-brand-mid bg-brand-light/10 p-4">
+          <h3 className="font-mono text-2xl text-brand-dark">Recent Orders</h3>
           <div className="mt-3 space-y-2">
             {orders.slice(0, 12).map((order) => (
-              <div key={order._id} className="border border-slate-200 p-2 text-sm">
+              <div key={order._id} className="border border-brand-mid bg-white p-2 text-sm">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-slate-900">{order.type.toUpperCase()} - {formatCurrency(order.amountTotal)}</p>
+                  <p className="text-brand-dark">{order.type.toUpperCase()} - {formatCurrency(order.amountTotal)}</p>
                   <span className={`rounded border px-2 py-0.5 text-xs ${stateBadgeClass(order.stripePaymentState || order.paymentStatus)}`}>
                     {(order.stripePaymentState || order.paymentStatus || 'pending').replaceAll('_', ' ')}
                   </span>
                 </div>
-                <p className="mt-1 text-slate-600">
+                <p className="mt-1 text-brand-mid">
                   {order.buyerEmail} | Payment {order.paymentStatus} | Order {order.fulfillmentStatus}
                 </p>
-                <p className="text-slate-600">
+                <p className="text-brand-mid">
                   Refund {formatCurrency(order.amountRefunded || 0)} | Dispute {order.stripeDisputeStatus || 'none'}
                   {order.needsManualReview ? ' | Manual review required' : ''}
                 </p>
-                <p className="font-mono text-xs text-slate-500">
+                <p className="font-mono text-xs text-brand-mid">
                   _id {shortId(order._id)} | Session {shortId(order.stripeCheckoutSessionId)}<br/>PI {shortId(order.stripePaymentIntentId)} | Ch {shortId(order.stripeChargeId)}
                 </p>
-                <p className="text-xs text-slate-500">{new Date(order.createdAt).toLocaleString()}</p>
+                <p className="text-xs text-brand-mid">{new Date(order.createdAt).toLocaleString()}</p>
               </div>
             ))}
           </div>
         </article>
 
-        <article className="border border-slate-500 bg-white p-4">
+        <article className="border border-brand-mid bg-brand-light/10 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="font-mono text-2xl text-slate-900">Signed Contracts</h3>
-            <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+            <h3 className="font-mono text-2xl text-brand-dark">Signed Contracts</h3>
+            <label className="inline-flex items-center gap-2 text-sm text-brand-mid">
               <input
                 type="checkbox"
                 checked={includeUnpaidContracts}
@@ -372,22 +372,22 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
           </div>
           <div className="mt-3 space-y-2">
             {contracts.slice(0, 12).map((contract) => (
-              <div key={contract._id} className="border border-slate-200 p-2 text-sm">
+              <div key={contract._id} className="border border-brand-mid bg-white p-2 text-sm">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-slate-900">{contract.templateType.toUpperCase()} with {contract.buyerName}</p>
+                  <p className="text-brand-dark">{contract.templateType.toUpperCase()} with {contract.buyerName}</p>
                   <span className={`rounded border px-2 py-0.5 text-xs ${stateBadgeClass(contract.paymentState)}`}>
                     {(contract.paymentState || 'pending').replaceAll('_', ' ')}
                   </span>
                 </div>
-                <p className="text-slate-700">Beat: {contract.beatTitle || 'Unknown Beat'}</p>
-                <p className="font-mono text-xs text-slate-500">
+                <p className="text-brand-mid">Beat: {contract.beatTitle || 'Unknown Beat'}</p>
+                <p className="font-mono text-xs text-brand-mid">
                   Session {shortId(contract.stripeCheckoutSessionId)} | PI {shortId(contract.stripePaymentIntentId)}
                 </p>
-                <p className="text-slate-600">
+                <p className="text-brand-mid">
                   {contract.needsManualReview ? 'Manual review required | ' : ''}
                   {contract.orderId ? `Order linked ${shortId(contract.orderId)}` : 'No paid order linked'}
                 </p>
-                <p className="text-slate-600">{contract.buyerEmail} | {new Date(contract.signedAt).toLocaleString()}</p>
+                <p className="text-brand-mid">{contract.buyerEmail} | {new Date(contract.signedAt).toLocaleString()}</p>
               </div>
             ))}
           </div>

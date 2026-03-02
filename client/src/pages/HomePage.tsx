@@ -93,7 +93,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   return (
     <div className="space-y-16 pb-20">
       <section className="relative overflow-hidden border-b border-brand-mid/30 bg-brand-cream py-20">
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:56px_56px]" />
+        <div className="pointer-events-none absolute inset-0 bg-brand-light/10" />
         <div className="relative mx-auto max-w-6xl px-4 md:px-6">
           <motion.h1
             initial={{ opacity: 0, y: 16 }}

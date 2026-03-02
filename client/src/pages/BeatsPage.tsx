@@ -116,6 +116,19 @@ export const BeatsPage: React.FC<BeatsPageProps> = ({ onNavigate }) => {
       />
 
       {error ? <p className="rounded border border-red-300 bg-red-50 p-3 text-red-700">{error}</p> : null}
+      
+      <section className="mx-auto max-w-6xl border border-brand-mid bg-brand-light/10 px-4 py-8 md:px-6">
+        <SectionHeader
+          eyebrow="Licensing"
+          title="Contract-first checkout"
+          description="Every beat purchase requires contract review and signature before Stripe payment checkout starts."
+        />
+        <div className="flex flex-wrap gap-3">
+          <button onClick={() => onNavigate('/licensing')} className="border border-brand-mid px-4 py-2 hover:bg-brand-light/20">
+            View License Hub
+          </button>
+        </div>
+      </section>
 
       <div className="grid gap-6 md:grid-cols-2">
         {beats.map((beat, idx) => {
@@ -174,19 +187,6 @@ export const BeatsPage: React.FC<BeatsPageProps> = ({ onNavigate }) => {
       <p className="text-center text-sm text-brand-mid">
         Inquire about songwriting services: junahblue@gmail.com
       </p>
-      
-      <section className="mx-auto max-w-6xl border border-brand-mid bg-brand-light/10 px-4 py-8 md:px-6">
-        <SectionHeader
-          eyebrow="Licensing"
-          title="Contract-first checkout"
-          description="Every beat purchase requires contract review and signature before Stripe payment checkout starts."
-        />
-        <div className="flex flex-wrap gap-3">
-          <button onClick={() => onNavigate('/licensing')} className="border border-brand-mid px-4 py-2 hover:bg-brand-light/20">
-            View License Hub
-          </button>
-        </div>
-      </section>
 
       <ContractModal
         isOpen={Boolean(selectedBeat)}

@@ -68,7 +68,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto bg-brand-dark/50 px-4 py-8">
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-brand-dark/50 px-4 py-8 !mt-0">
       <div className="mx-auto max-w-3xl border border-brand-mid bg-brand-cream p-5 md:p-8">
         <div className="flex items-start justify-between gap-4">
           <div>

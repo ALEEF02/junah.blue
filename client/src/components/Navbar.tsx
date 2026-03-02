@@ -15,10 +15,9 @@ interface NavbarProps {
 }
 
 const navItems: NavItem[] = [
-  { label: 'HOME', path: '/', owner: false},
+  { label: 'ABOUT', path: '/', owner: false},
   { label: 'BEATS', path: '/beats', owner: false },
   { label: 'APPAREL', path: '/apparel', owner: false },
-  { label: 'LICENSING', path: '/licensing', owner: false },
   { label: 'DASHBOARD', path: '/dashboard', owner: true } 
 ];
 

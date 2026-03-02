@@ -49,7 +49,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         setBeatsError(null);
         const beatsRes = await api.getPublicBeats();
         if (!cancelled) {
-          setBeats(beatsRes.beats.slice(0, 4));
+          setBeats(beatsRes.beats.slice(0, 1));
         }
       } catch (err) {
         if (!cancelled) {
@@ -68,7 +68,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         setApparelError(null);
         const apparelRes = await api.getApparelProducts();
         if (!cancelled) {
-          setApparel(apparelRes.products.slice(0, 3));
+          setApparel(apparelRes.products.slice(0, 1));
         }
       } catch (err) {
         if (!cancelled) {
@@ -121,30 +121,28 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         {profileError ? <p className="text-red-600">{profileError}</p> : null}
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 md:px-6">
-        <SectionHeader eyebrow="Beat Marketplace" title="Featured Beats" />
-        {beatsError ? <p className="text-red-600">{beatsError}</p> : null}
-        {beatsLoading ? <p className="text-brand-mid">Loading beats...</p> : null}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {beats.map((beat, index) => (
+      <section className="mx-auto grid max-w-6xl gap-8 px-4 md:px-6 lg:grid-cols-2">
+        <div className="space-y-4">
+          <SectionHeader eyebrow="Beat Marketplace" title="Latest Beat" />
+          {beatsError ? <p className="text-red-600">{beatsError}</p> : null}
+          {beatsLoading ? <p className="text-brand-mid">Loading beats...</p> : null}
+          {beats.map((beat) => (
             <EditorialCard
               key={beat.id}
               category={beat.isAvailable ? 'Available' : 'Sold'}
               title={beat.title}
               description={`${formatCurrency(beat.pricing.nonExclusivePriceCents)} non-exclusive / ${formatCurrency(beat.pricing.exclusivePriceCents)} exclusive`}
-              accent={index % 2 === 0 ? 'text-brand-mid' : 'text-brand-light'}
+              accent="text-brand-mid"
               onArrowClick={() => onNavigate('/beats')}
             />
           ))}
         </div>
-      </section>
 
-      <section className="mx-auto max-w-6xl px-4 md:px-6">
-        <SectionHeader eyebrow="Apparel" title="Latest Drops" />
-        {apparelError ? <p className="text-red-600">{apparelError}</p> : null}
-        {apparelLoading ? <p className="text-brand-mid">Loading apparel...</p> : null}
-        <div className="grid gap-6 md:grid-cols-3">
-          {apparel.map((product, index) => (
+        <div className="space-y-4">
+          <SectionHeader eyebrow="Apparel" title="Latest Drop" />
+          {apparelError ? <p className="text-red-600">{apparelError}</p> : null}
+          {apparelLoading ? <p className="text-brand-mid">Loading apparel...</p> : null}
+          {apparel.map((product) => (
             <EditorialCard
               key={product.id}
               category="Product"
@@ -155,7 +153,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   : 'Pricing unavailable'
               }
               imageUrl={product.imageUrl}
-              accent={index === 1 ? 'text-brand-light' : 'text-brand-mid'}
+              accent="text-brand-light"
               onArrowClick={() => onNavigate('/apparel')}
             />
           ))}

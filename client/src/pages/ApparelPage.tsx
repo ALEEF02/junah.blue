@@ -13,8 +13,22 @@ interface CartItem {
   amountCents: number;
 }
 
+interface ProductOptionSelection {
+  color: string;
+  size: string;
+}
+
+interface ParsedVariant {
+  variant: ApparelProduct['variants'][number];
+  color: string;
+  size: string;
+}
+
 const stripeColors = ['#111827', '#2563eb', '#22d3ee', '#f43f5e', '#f59e0b', '#84cc16'];
 const MAX_STRIPE_SEGMENTS = 10;
+const fallbackSelection: ProductOptionSelection = { color: '', size: '' };
+const sizeLabelPattern =
+  /^(xxxs|xxs|xs|s|m|l|xl|xxl|xxxl|2xl|3xl|4xl|5xl|6xl|7xl|one size|onesize|os|osfa|osfm|youth (xxs|xs|s|m|l|xl)|toddler .+|infant .+)$/i;
 
 const normalizeColorText = (value: string) =>
   value
@@ -29,6 +43,34 @@ const namedColorEntries = (colornames as Array<{ name: string; hex: string }>)
     hex: entry.hex.toLowerCase()
   }))
   .filter((entry): entry is { normalizedName: string; hex: string } => Boolean(entry.normalizedName && entry.hex));
+
+const uniqueValues = (values: string[]) => Array.from(new Set(values.filter(Boolean)));
+const isSizeLabel = (value: string) => sizeLabelPattern.test(value.trim());
+
+const parseVariantDimensions = (title: string): ProductOptionSelection => {
+  const parts = title
+    .split('/')
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (parts.length === 0) {
+    return { color: 'Default', size: 'One Size' };
+  }
+
+  let sizeIndex = parts.findIndex((part) => isSizeLabel(part));
+  if (sizeIndex === -1 && parts.length > 1) {
+    sizeIndex = parts.length - 1;
+  }
+
+  const size = sizeIndex >= 0 ? parts[sizeIndex] : 'One Size';
+  const colorCandidate = parts.find((part, index) => index !== sizeIndex && !isSizeLabel(part));
+  const color = colorCandidate || parts[0] || 'Default';
+
+  return {
+    color,
+    size
+  };
+};
 
 const isWholeWordMatch = (title: string, match: string, startIndex: number) => {
   const before = startIndex === 0 || title[startIndex - 1] === ' ';
@@ -107,7 +149,7 @@ const extractStripeColors = (product: ApparelProduct) => {
 
 export const ApparelPage: React.FC = () => {
   const [products, setProducts] = useState<ApparelProduct[]>([]);
-  const [variantSelection, setVariantSelection] = useState<Record<string, string | number>>({});
+  const [optionSelection, setOptionSelection] = useState<Record<string, ProductOptionSelection>>({});
   const [cart, setCart] = useState<CartItem[]>([]);
   const [buyerEmail, setBuyerEmail] = useState('');
   const [loading, setLoading] = useState(true);
@@ -118,10 +160,10 @@ export const ApparelPage: React.FC = () => {
       try {
         const response = await api.getApparelProducts();
         setProducts(response.products);
-        setVariantSelection(
-          response.products.reduce<Record<string, string | number>>((acc, product) => {
+        setOptionSelection(
+          response.products.reduce<Record<string, ProductOptionSelection>>((acc, product) => {
             if (product.variants[0]) {
-              acc[product.id] = product.variants[0].id;
+              acc[product.id] = parseVariantDimensions(product.variants[0].title);
             }
             return acc;
           }, {})
@@ -148,12 +190,23 @@ export const ApparelPage: React.FC = () => {
       }, {}),
     [products]
   );
+  const productVariantMatrix = useMemo(
+    () =>
+      products.reduce<Record<string, ParsedVariant[]>>((acc, product) => {
+        acc[product.id] = product.variants.map((variant) => {
+          const parsed = parseVariantDimensions(variant.title);
+          return {
+            variant,
+            color: parsed.color,
+            size: parsed.size
+          };
+        });
+        return acc;
+      }, {}),
+    [products]
+  );
 
-  const addToCart = (product: ApparelProduct) => {
-    const variantId = variantSelection[product.id];
-    const variant = product.variants.find((entry) => String(entry.id) === String(variantId));
-    if (!variant) return;
-
+  const addToCart = (product: ApparelProduct, variant: ApparelProduct['variants'][number]) => {
     setCart((current) => {
       const existing = current.find(
         (item) => item.productId === product.id && String(item.variantId) === String(variant.id)
@@ -180,6 +233,44 @@ export const ApparelPage: React.FC = () => {
           amountCents: variant.priceCents
         }
       ];
+    });
+  };
+  const onColorChange = (productId: string, color: string) => {
+    const parsedVariants = productVariantMatrix[productId] || [];
+
+    setOptionSelection((current) => {
+      const currentSelection = current[productId] || fallbackSelection;
+      const nextSizes = uniqueValues(
+        parsedVariants.filter((entry) => entry.color === color).map((entry) => entry.size)
+      );
+      const nextSize = nextSizes.includes(currentSelection.size) ? currentSelection.size : nextSizes[0] || '';
+
+      return {
+        ...current,
+        [productId]: {
+          color,
+          size: nextSize
+        }
+      };
+    });
+  };
+  const onSizeChange = (productId: string, size: string) => {
+    const parsedVariants = productVariantMatrix[productId] || [];
+
+    setOptionSelection((current) => {
+      const currentSelection = current[productId] || fallbackSelection;
+      const nextColors = uniqueValues(
+        parsedVariants.filter((entry) => entry.size === size).map((entry) => entry.color)
+      );
+      const nextColor = nextColors.includes(currentSelection.color) ? currentSelection.color : nextColors[0] || '';
+
+      return {
+        ...current,
+        [productId]: {
+          color: nextColor,
+          size
+        }
+      };
     });
   };
 
@@ -238,9 +329,28 @@ export const ApparelPage: React.FC = () => {
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {products.map((product) => {
-            const selectedVariant =
-              product.variants.find((entry) => String(entry.id) === String(variantSelection[product.id])) ||
-              product.variants[0];
+            const parsedVariants = productVariantMatrix[product.id] || [];
+            const currentSelection = optionSelection[product.id] || fallbackSelection;
+            const selectedVariantEntry =
+              parsedVariants.find(
+                (entry) => entry.color === currentSelection.color && entry.size === currentSelection.size
+              ) ||
+              parsedVariants.find((entry) => entry.color === currentSelection.color) ||
+              parsedVariants.find((entry) => entry.size === currentSelection.size) ||
+              parsedVariants[0];
+            const selectedVariant = selectedVariantEntry?.variant;
+            const selectedColor = selectedVariantEntry?.color || currentSelection.color;
+            const selectedSize = selectedVariantEntry?.size || currentSelection.size;
+            const availableColors = uniqueValues(
+              parsedVariants
+                .filter((entry) => !selectedSize || entry.size === selectedSize)
+                .map((entry) => entry.color)
+            );
+            const availableSizes = uniqueValues(
+              parsedVariants
+                .filter((entry) => !selectedColor || entry.color === selectedColor)
+                .map((entry) => entry.size)
+            );
 
             return (
               <article key={product.id} className="border border-slate-400 bg-stone-100">
@@ -271,27 +381,38 @@ export const ApparelPage: React.FC = () => {
                   <h3 className="font-mono text-2xl leading-tight text-slate-900">{product.title}</h3>
 
                   <label className="block text-sm">
-                    <span className="mb-1 block uppercase tracking-[0.2em] text-slate-600">Variant</span>
+                    <span className="mb-1 block uppercase tracking-[0.2em] text-slate-600">Color</span>
                     <select
-                      value={String(variantSelection[product.id] || '')}
-                      onChange={(e) =>
-                        setVariantSelection((current) => ({
-                          ...current,
-                          [product.id]: e.target.value
-                        }))
-                      }
+                      value={selectedColor}
+                      onChange={(e) => onColorChange(product.id, e.target.value)}
                       className="w-full border border-slate-400 bg-white px-2 py-2"
                     >
-                      {product.variants.map((variant) => (
-                        <option key={variant.id} value={String(variant.id)}>
-                          {variant.title} - {formatCurrency(variant.priceCents)}
+                      {availableColors.map((color) => (
+                        <option key={`${product.id}-color-${color}`} value={color}>
+                          {color}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="block text-sm">
+                    <span className="mb-1 block uppercase tracking-[0.2em] text-slate-600">Size</span>
+                    <select
+                      value={selectedSize}
+                      onChange={(e) => onSizeChange(product.id, e.target.value)}
+                      className="w-full border border-slate-400 bg-white px-2 py-2"
+                    >
+                      {availableSizes.map((size) => (
+                        <option key={`${product.id}-size-${size}`} value={size}>
+                          {size}
                         </option>
                       ))}
                     </select>
                   </label>
 
                   <button
-                    onClick={() => addToCart(product)}
+                    onClick={() => selectedVariant && addToCart(product, selectedVariant)}
+                    disabled={!selectedVariant}
                     className="w-full bg-emerald-500 px-4 py-2 font-semibold text-slate-950 transition hover:bg-emerald-400"
                   >
                     Add To Cart {selectedVariant ? `- ${formatCurrency(selectedVariant.priceCents)}` : ''}

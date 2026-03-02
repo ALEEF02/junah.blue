@@ -353,9 +353,9 @@ export const ApparelPage: React.FC = () => {
             );
 
             return (
-              <article key={product.id} className="border border-slate-400 bg-stone-100">
-                <div className="border-b border-slate-300 p-3">
-                  <p className="font-semibold text-slate-900">{selectedVariant?.title || 'Variant'}</p>
+              <article key={product.id} className="border border-brand-mid bg-brand-cream">
+                <div className="border-b border-brand-mid p-3">
+                  <p className="font-semibold text-brand-dark">{selectedVariant?.title || 'Variant'}</p>
                   <div className="mt-2 flex gap-1">
                     {(productStripeColors[product.id] || stripeColors).map((color, stripeIndex) => (
                       <div
@@ -367,7 +367,7 @@ export const ApparelPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="aspect-square bg-slate-100">
+                <div className="aspect-square bg-brand-light/10">
                   {(selectedVariant?.imageUrl || product.imageUrl) ? (
                     <img
                       src={selectedVariant?.imageUrl || product.imageUrl}
@@ -378,14 +378,14 @@ export const ApparelPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-3 p-3">
-                  <h3 className="font-mono text-2xl leading-tight text-slate-900">{product.title}</h3>
+                  <h3 className="font-mono text-2xl leading-tight text-brand-dark">{product.title}</h3>
 
                   <label className="block text-sm">
-                    <span className="mb-1 block uppercase tracking-[0.2em] text-slate-600">Color</span>
+                    <span className="mb-1 block uppercase tracking-[0.2em] text-brand-mid">Color</span>
                     <select
                       value={selectedColor}
                       onChange={(e) => onColorChange(product.id, e.target.value)}
-                      className="w-full border border-slate-400 bg-white px-2 py-2"
+                      className="w-full border border-brand-mid bg-brand-light/10 px-2 py-2"
                     >
                       {availableColors.map((color) => (
                         <option key={`${product.id}-color-${color}`} value={color}>
@@ -396,11 +396,11 @@ export const ApparelPage: React.FC = () => {
                   </label>
 
                   <label className="block text-sm">
-                    <span className="mb-1 block uppercase tracking-[0.2em] text-slate-600">Size</span>
+                    <span className="mb-1 block uppercase tracking-[0.2em] text-brand-mid">Size</span>
                     <select
                       value={selectedSize}
                       onChange={(e) => onSizeChange(product.id, e.target.value)}
-                      className="w-full border border-slate-400 bg-white px-2 py-2"
+                      className="w-full border border-brand-mid bg-brand-light/10 px-2 py-2"
                     >
                       {availableSizes.map((size) => (
                         <option key={`${product.id}-size-${size}`} value={size}>
@@ -413,7 +413,7 @@ export const ApparelPage: React.FC = () => {
                   <button
                     onClick={() => selectedVariant && addToCart(product, selectedVariant)}
                     disabled={!selectedVariant}
-                    className="w-full bg-emerald-500 px-4 py-2 font-semibold text-slate-950 transition hover:bg-emerald-400"
+                    className="w-full bg-brand-mid px-4 py-2 font-semibold text-brand-cream transition hover:bg-brand-dark"
                   >
                     Add To Cart {selectedVariant ? `- ${formatCurrency(selectedVariant.priceCents)}` : ''}
                   </button>
@@ -423,36 +423,36 @@ export const ApparelPage: React.FC = () => {
           })}
         </div>
 
-        <aside className="h-fit border border-slate-500 bg-white p-4">
-          <h3 className="font-mono text-3xl text-slate-900">Cart</h3>
+        <aside className="h-fit border border-brand-mid bg-brand-light/10 p-4">
+          <h3 className="font-mono text-3xl text-brand-dark">Cart</h3>
           <div className="mt-3 space-y-3">
-            {cart.length === 0 ? <p className="text-slate-600">No items yet.</p> : null}
+            {cart.length === 0 ? <p className="text-brand-mid">No items yet.</p> : null}
             {cart.map((item, idx) => (
-              <div key={`${item.productId}-${item.variantId}-${idx}`} className="border border-slate-300 p-2">
-                <p className="text-sm text-slate-900">{item.label}</p>
-                <p className="text-sm text-slate-600">
+              <div key={`${item.productId}-${item.variantId}-${idx}`} className="border border-brand-mid p-2">
+                <p className="text-sm text-brand-dark">{item.label}</p>
+                <p className="text-sm text-brand-mid">
                   Qty {item.quantity} - {formatCurrency(item.amountCents)} each
                 </p>
               </div>
             ))}
           </div>
 
-          <div className="mt-4 border-t border-slate-200 pt-3">
+          <div className="mt-4 border-t border-brand-mid pt-3">
             <label className="block text-sm">
-              <span className="mb-1 block uppercase tracking-[0.2em] text-slate-600">Receipt Email (optional)</span>
+              <span className="mb-1 block uppercase tracking-[0.2em] text-brand-mid">Receipt Email (optional)</span>
               <input
                 type="email"
                 value={buyerEmail}
                 onChange={(e) => setBuyerEmail(e.target.value)}
-                className="w-full border border-slate-400 px-2 py-2"
+                className="w-full border border-brand-mid px-2 py-2"
                 placeholder="you@example.com"
               />
             </label>
 
-            <p className="mt-3 text-lg text-slate-800">Total: {formatCurrency(cartTotal)}</p>
+            <p className="mt-3 text-lg text-brand-dark">Total: {formatCurrency(cartTotal)}</p>
             <button
               onClick={checkout}
-              className="mt-3 w-full rounded-full border border-slate-400 bg-lime-300 px-4 py-2 text-slate-900 hover:bg-lime-200"
+              className="mt-3 w-full rounded-full border border-brand-mid bg-brand-mid px-4 py-2 text-brand-cream hover:bg-brand-dark"
             >
               Checkout Apparel
             </button>

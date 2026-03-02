@@ -21,7 +21,7 @@ export const PillCTA: React.FC<PillCTAProps> = ({ label, onClick, className = ''
       transition={{ duration: 0.1, ease: "easeOut" }}
       whileTap={{ y: 3, boxShadow: 'none' }}
       onClick={onClick}
-      className={`group inline-flex items-center gap-3 rounded-full border border-slate-400 bg-lime-300 px-7 py-3 text-xl text-slate-900 shadow-[0_3px_0_0_rgba(15,23,42,0.25)] hover:bg-lime-200 ${className}`}
+      className={`group inline-flex items-center gap-3 rounded-full border border-brand-mid bg-brand-mid px-7 py-3 text-xl text-brand-cream shadow-[0_3px_0_0_rgba(15,23,42,0.25)] hover:bg-brand-dark ${className}`}
     >
       <span>{label}</span>
       <motion.span

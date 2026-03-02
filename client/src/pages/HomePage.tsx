@@ -92,18 +92,18 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
   return (
     <div className="space-y-16 pb-20">
-      <section className="relative overflow-hidden border-b border-slate-400/30 bg-stone-100 py-20">
+      <section className="relative overflow-hidden border-b border-brand-mid/30 bg-brand-cream py-20">
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:56px_56px]" />
         <div className="relative mx-auto max-w-6xl px-4 md:px-6">
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mx-auto max-w-4xl text-center text-5xl font-semibold leading-tight tracking-tight text-slate-900 md:text-8xl"
+            className="mx-auto max-w-4xl text-center text-5xl font-semibold leading-tight tracking-tight text-brand-dark md:text-8xl"
           >
             Junah beats, contracts, and artist merchandise in one workflow.
           </motion.h1>
-          <p className="mx-auto mt-5 max-w-2xl text-center text-xl text-slate-700">
+          <p className="mx-auto mt-5 max-w-2xl text-center text-xl text-brand-mid">
             Preview tracks, sign licensing agreements, checkout securely, and receive deliverables automatically.
           </p>
           <div className="mt-8 flex justify-center">
@@ -124,7 +124,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       <section className="mx-auto max-w-6xl px-4 md:px-6">
         <SectionHeader eyebrow="Beat Marketplace" title="Featured Beats" />
         {beatsError ? <p className="text-red-600">{beatsError}</p> : null}
-        {beatsLoading ? <p className="text-slate-600">Loading beats...</p> : null}
+        {beatsLoading ? <p className="text-brand-mid">Loading beats...</p> : null}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {beats.map((beat, index) => (
             <EditorialCard
@@ -132,7 +132,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               category={beat.isAvailable ? 'Available' : 'Sold'}
               title={beat.title}
               description={`${formatCurrency(beat.pricing.nonExclusivePriceCents)} non-exclusive / ${formatCurrency(beat.pricing.exclusivePriceCents)} exclusive`}
-              accent={index % 2 === 0 ? 'text-violet-600' : 'text-cyan-500'}
+              accent={index % 2 === 0 ? 'text-brand-mid' : 'text-brand-light'}
               onArrowClick={() => onNavigate('/beats')}
             />
           ))}
@@ -142,7 +142,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       <section className="mx-auto max-w-6xl px-4 md:px-6">
         <SectionHeader eyebrow="Apparel" title="Latest Drops" />
         {apparelError ? <p className="text-red-600">{apparelError}</p> : null}
-        {apparelLoading ? <p className="text-slate-600">Loading apparel...</p> : null}
+        {apparelLoading ? <p className="text-brand-mid">Loading apparel...</p> : null}
         <div className="grid gap-6 md:grid-cols-3">
           {apparel.map((product, index) => (
             <EditorialCard
@@ -155,24 +155,24 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   : 'Pricing unavailable'
               }
               imageUrl={product.imageUrl}
-              accent={index === 1 ? 'text-emerald-500' : 'text-violet-600'}
+              accent={index === 1 ? 'text-brand-light' : 'text-brand-mid'}
               onArrowClick={() => onNavigate('/apparel')}
             />
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl border border-slate-500 bg-white px-4 py-8 md:px-6">
+      <section className="mx-auto max-w-6xl border border-brand-mid bg-brand-light/10 px-4 py-8 md:px-6">
         <SectionHeader
           eyebrow="Licensing"
           title="Contract-first checkout"
           description="Every beat purchase requires contract review and signature before Stripe payment checkout starts."
         />
         <div className="flex flex-wrap gap-3">
-          <button onClick={() => onNavigate('/licensing')} className="border border-slate-500 px-4 py-2 hover:bg-slate-100">
+          <button onClick={() => onNavigate('/licensing')} className="border border-brand-mid px-4 py-2 hover:bg-brand-light/20">
             View License Hub
           </button>
-          <button onClick={() => onNavigate('/beats')} className="border border-violet-500 px-4 py-2 text-violet-600 hover:bg-violet-50">
+          <button onClick={() => onNavigate('/beats')} className="border border-brand-mid px-4 py-2 text-brand-mid hover:bg-brand-light/25">
             Browse Beats
           </button>
         </div>

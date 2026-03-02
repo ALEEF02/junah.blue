@@ -20,9 +20,9 @@ import { CheckoutFeedbackModal } from './components/CheckoutFeedbackModal';
 
 const NotFoundPage: React.FC = () => (
   <div className="mx-auto max-w-4xl px-4 py-16 md:px-6">
-    <p className="text-xs uppercase tracking-[0.35em] text-violet-600">404</p>
-    <h1 className="mt-2 font-mono text-6xl text-slate-900">Page Not Found</h1>
-    <p className="mt-3 text-slate-700">The route you requested does not exist on this build.</p>
+    <p className="text-xs uppercase tracking-[0.35em] text-brand-mid">404</p>
+    <h1 className="mt-2 font-mono text-6xl text-brand-dark">Page Not Found</h1>
+    <p className="mt-3 text-brand-mid">The route you requested does not exist on this build.</p>
   </div>
 );
 
@@ -165,7 +165,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-100 text-slate-900">
+    <div className="min-h-screen bg-brand-cream text-brand-dark">
       <Navbar path={path} onNavigate={navigate} isOwnerAuthed={Boolean(ownerUser)} onLogout={logout} />
       <main>{content}</main>
       <Footer onNavigate={navigate} />

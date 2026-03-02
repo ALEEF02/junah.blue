@@ -27,12 +27,12 @@ export const AudioPreviewPlayer: React.FC<AudioPreviewPlayerProps> = ({ previewU
       <button
         onClick={togglePlayback}
         disabled={!previewUrl}
-        className="flex h-10 w-10 items-center justify-center border border-slate-500 text-violet-600 transition hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-10 w-10 items-center justify-center border border-brand-mid text-brand-mid transition hover:bg-brand-light/25 disabled:cursor-not-allowed disabled:opacity-40"
         aria-label="Toggle beat preview"
       >
         {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
       </button>
-      <span className="text-sm uppercase tracking-[0.2em] text-slate-600">Preview</span>
+      <span className="text-sm uppercase tracking-[0.2em] text-brand-mid">Preview</span>
       <audio ref={audioRef} src={previewUrl} onEnded={() => setIsPlaying(false)} preload="none" />
     </div>
   );

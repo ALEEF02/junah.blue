@@ -101,10 +101,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             transition={{ duration: 0.5 }}
             className="mx-auto max-w-4xl text-center text-5xl font-semibold leading-tight tracking-tight text-brand-dark md:text-8xl"
           >
-            Junah beats, contracts, and artist merchandise in one workflow.
+            Junah beats, artist merchandise, and contracts.
           </motion.h1>
           <p className="mx-auto mt-5 max-w-2xl text-center text-xl text-brand-mid">
-            Preview tracks, sign licensing agreements, checkout securely, and receive deliverables automatically.
+            Preview tracks, sign licensing agreements, checkout securely, and receive beats automatically.
           </p>
           <div className="mt-8 flex justify-center">
             <PillCTA label="Get started now" onClick={() => onNavigate('/beats')} />
@@ -159,22 +159,6 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               onArrowClick={() => onNavigate('/apparel')}
             />
           ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl border border-brand-mid bg-brand-light/10 px-4 py-8 md:px-6">
-        <SectionHeader
-          eyebrow="Licensing"
-          title="Contract-first checkout"
-          description="Every beat purchase requires contract review and signature before Stripe payment checkout starts."
-        />
-        <div className="flex flex-wrap gap-3">
-          <button onClick={() => onNavigate('/licensing')} className="border border-brand-mid px-4 py-2 hover:bg-brand-light/20">
-            View License Hub
-          </button>
-          <button onClick={() => onNavigate('/beats')} className="border border-brand-mid px-4 py-2 text-brand-mid hover:bg-brand-light/25">
-            Browse Beats
-          </button>
         </div>
       </section>
     </div>

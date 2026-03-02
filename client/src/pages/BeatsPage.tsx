@@ -6,7 +6,11 @@ import { SectionHeader } from '../components/SectionHeader';
 import { AudioPreviewPlayer } from '../components/AudioPreviewPlayer';
 import { ContractModal } from '../components/ContractModal';
 
-export const BeatsPage: React.FC = () => {
+interface BeatsPageProps {
+  onNavigate: (path: string) => void;
+}
+
+export const BeatsPage: React.FC<BeatsPageProps> = ({ onNavigate }) => {
   const [beats, setBeats] = useState<Beat[]>([]);
   const [templates, setTemplates] = useState<ContractTemplate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -166,6 +170,23 @@ export const BeatsPage: React.FC = () => {
           );
         })}
       </div>
+
+      <p className="text-center text-sm text-brand-mid">
+        Inquire about songwriting services: junahblue@gmail.com
+      </p>
+      
+      <section className="mx-auto max-w-6xl border border-brand-mid bg-brand-light/10 px-4 py-8 md:px-6">
+        <SectionHeader
+          eyebrow="Licensing"
+          title="Contract-first checkout"
+          description="Every beat purchase requires contract review and signature before Stripe payment checkout starts."
+        />
+        <div className="flex flex-wrap gap-3">
+          <button onClick={() => onNavigate('/licensing')} className="border border-brand-mid px-4 py-2 hover:bg-brand-light/20">
+            View License Hub
+          </button>
+        </div>
+      </section>
 
       <ContractModal
         isOpen={Boolean(selectedBeat)}

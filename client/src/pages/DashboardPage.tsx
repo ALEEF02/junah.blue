@@ -335,7 +335,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
           <h3 className="font-mono text-2xl text-brand-dark">Recent Orders</h3>
           <div className="mt-3 space-y-2">
             {orders.slice(0, 12).map((order) => (
-              <div key={order._id} className="border border-brand-mid p-2 text-sm">
+              <div key={order._id} className="border border-brand-mid bg-white p-2 text-sm">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-brand-dark">{order.type.toUpperCase()} - {formatCurrency(order.amountTotal)}</p>
                   <span className={`rounded border px-2 py-0.5 text-xs ${stateBadgeClass(order.stripePaymentState || order.paymentStatus)}`}>
@@ -372,7 +372,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onAuth
           </div>
           <div className="mt-3 space-y-2">
             {contracts.slice(0, 12).map((contract) => (
-              <div key={contract._id} className="border border-brand-mid p-2 text-sm">
+              <div key={contract._id} className="border border-brand-mid bg-white p-2 text-sm">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-brand-dark">{contract.templateType.toUpperCase()} with {contract.buyerName}</p>
                   <span className={`rounded border px-2 py-0.5 text-xs ${stateBadgeClass(contract.paymentState)}`}>

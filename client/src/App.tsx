@@ -125,7 +125,7 @@ function App() {
 
   const content = useMemo(() => {
     if (path === '/') return <HomePage onNavigate={navigate} />;
-    if (path === '/beats') return <BeatsPage />;
+    if (path === '/beats') return <BeatsPage onNavigate={navigate}/>;
     if (path === '/apparel') return <ApparelPage />;
     if (path === '/licensing') return <LicensingPage />;
     if (path === '/login') {

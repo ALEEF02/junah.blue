@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@300;400;600&family=Source+Sans+3:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Aladin&family=Fraunces:opsz,wght@9..144,100..900&family=Lateef:wght@200;300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,9 +7,9 @@
 :root {
   --bg-main: #efefec;
   --text-main: #030A3F;
-  --brand-dark: #030A3F;
-  --brand-mid: #406995;
-  --brand-light: #7FC6EB;
+  --brand-dark: #023C85;
+  --brand-mid: #0172B0;
+  --brand-light: #89D6E8;
 }
 
 html,
@@ -22,16 +22,37 @@ body {
   margin: 0;
   background: var(--bg-main);
   color: var(--text-main);
-  font-family: 'Source Sans 3', sans-serif;
+  font-family: 'Fraunces', serif;
 }
 
 h1,
 h2,
 h3,
 h4 {
-  font-family: 'Dosis', sans-serif;
+  font-family: 'Aladin', cursive;
 }
 
 .font-mono {
-  font-family: 'Space Mono', monospace;
+  font-family: 'Aladin', cursive;
+}
+
+.text-xs,
+.text-sm,
+small {
+  font-family: 'Lateef', cursive;
+}
+
+.text-xs {
+  font-size: calc(0.75rem * 1.25);
+  line-height: 0.9;
+}
+
+.text-sm {
+  font-size: calc(0.875rem * 1.25);
+  line-height: 0.9;
+}
+
+small {
+  font-size: 1.15em;
+  line-height: 1.1;
 }

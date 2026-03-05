@@ -93,13 +93,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   return (
     <div className="space-y-16 pb-20">
       <section className="relative overflow-hidden border-b border-brand-mid/30 bg-brand-cream py-20">
-        <div className="pointer-events-none absolute inset-0 bg-brand-light/10" />
+        <div className="pointer-events-none absolute inset-0" />
         <div className="relative mx-auto max-w-6xl px-4 md:px-6">
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mx-auto max-w-4xl text-center text-5xl font-semibold leading-tight tracking-tight text-brand-dark md:text-8xl"
+            className="mx-auto max-w-4xl text-center text-5xl leading-tight tracking-tight text-brand-dark md:text-8xl"
           >
             Junah beats, artist merchandise, and contracts.
           </motion.h1>

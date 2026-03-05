@@ -9,7 +9,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
     <footer className="border-t border-brand-mid/40 bg-brand-cream py-12">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 md:grid-cols-3 md:px-6">
         <div>
-          <h3 className="text-5xl font-semibold tracking-tight">Junah</h3>
+          <h3 className="text-5xl tracking-tight">Junah</h3>
           <p className="mt-3 max-w-sm text-brand-mid">
             Producer and artist marketplace for licensing beats, purchasing apparel, and managing creator contracts.
           </p>

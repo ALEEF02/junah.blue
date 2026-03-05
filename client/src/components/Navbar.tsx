@@ -15,7 +15,8 @@ interface NavbarProps {
 }
 
 const navItems: NavItem[] = [
-  { label: 'ABOUT', path: '/', owner: false},
+  { label: 'HOME', path: '/', owner: false},
+  { label: 'ABOUT', path: '/about', owner: false},
   { label: 'BEATS', path: '/beats', owner: false },
   { label: 'APPAREL', path: '/apparel', owner: false },
   { label: 'DASHBOARD', path: '/dashboard', owner: true } 
@@ -91,18 +92,21 @@ export const Navbar: React.FC<NavbarProps> = ({ path, onNavigate, isOwnerAuthed,
 
         {mobileOpen && (
           <div className="mt-3 space-y-2 border-t border-brand-mid pt-3 md:hidden">
-            {navItems.map((item) => (
-              <button
-                key={item.path}
-                onClick={() => {
-                  onNavigate(item.path);
-                  setMobileOpen(false);
-                }}
-                className={`block w-full text-left text-sm tracking-[0.2em] ${path === item.path ? 'text-brand-mid' : 'text-brand-dark'}`}
-              >
-                {item.label}
-              </button>
-            ))}
+            {navItems.map((item) => {
+              if (item.owner && !isOwnerAuthed) return null;
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => {
+                    onNavigate(item.path);
+                    setMobileOpen(false);
+                  }}
+                  className={`block w-full text-left text-sm tracking-[0.2em] ${path === item.path ? 'text-brand-mid' : 'text-brand-dark'}`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
             {isOwnerAuthed && (
               <button onClick={handleCta} className="mt-2 w-full rounded-full bg-brand-mid px-4 py-2 text-brand-cream">
                 {ctaLabel}

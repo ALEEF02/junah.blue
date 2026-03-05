@@ -3,6 +3,7 @@ import './App.css';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { HomePage } from './pages/HomePage';
+import { AboutPage } from './pages/AboutPage';
 import { BeatsPage } from './pages/BeatsPage';
 import { ApparelPage } from './pages/ApparelPage';
 import { LicensingPage } from './pages/LicensingPage';
@@ -125,6 +126,7 @@ function App() {
 
   const content = useMemo(() => {
     if (path === '/') return <HomePage onNavigate={navigate} />;
+    if (path === '/about') return <AboutPage onNavigate={navigate} />;
     if (path === '/beats') return <BeatsPage onNavigate={navigate}/>;
     if (path === '/apparel') return <ApparelPage />;
     if (path === '/licensing') return <LicensingPage />;

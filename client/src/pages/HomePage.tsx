@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { EditorialCard } from '../components/EditorialCard';
 import { PillCTA } from '../components/PillCTA';
@@ -90,16 +90,29 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     };
   }, []);
 
+  const shortBio = useMemo(() => {
+    const bio = profile?.bio?.trim();
+    if (!bio) return '';
+    const maxLength = 260;
+    if (bio.length <= maxLength) return bio;
+    const clipped = bio.slice(0, maxLength);
+    const breakPoint = clipped.lastIndexOf(' ');
+    if (breakPoint > 160) {
+      return `${clipped.slice(0, breakPoint)}...`;
+    }
+    return `${clipped}...`;
+  }, [profile?.bio]);
+
   return (
     <div className="space-y-16 pb-20">
       <section className="relative overflow-hidden border-b border-brand-mid/30 bg-brand-cream py-20">
-        <div className="pointer-events-none absolute inset-0 bg-brand-light/10" />
+        <div className="pointer-events-none absolute inset-0" />
         <div className="relative mx-auto max-w-6xl px-4 md:px-6">
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mx-auto max-w-4xl text-center text-5xl font-semibold leading-tight tracking-tight text-brand-dark md:text-8xl"
+            className="mx-auto max-w-4xl text-center text-5xl leading-tight tracking-tight text-brand-dark md:text-8xl"
           >
             Junah beats, artist merchandise, and contracts.
           </motion.h1>
@@ -113,12 +126,18 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 md:px-6">
-        <SectionHeader
-          eyebrow="Biography"
-          title={profile?.headline || 'Junah'}
-          description={profileLoading ? 'Loading biography...' : profile?.bio}
-        />
+        <SectionHeader eyebrow="Biography" title={profile?.headline || 'Junah'} />
         {profileError ? <p className="text-red-600">{profileError}</p> : null}
+        {profileLoading ? <p className="text-brand-mid">Loading biography...</p> : null}
+        {!profileLoading && profile ? (
+          <EditorialCard
+            category="About"
+            title={profile.name || 'Junah'}
+            description={shortBio}
+            accent="text-brand-light"
+            onArrowClick={() => onNavigate('/about')}
+          />
+        ) : null}
       </section>
 
       <section className="mx-auto grid max-w-6xl gap-8 px-4 md:px-6 lg:grid-cols-2">

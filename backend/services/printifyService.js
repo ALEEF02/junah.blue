@@ -34,6 +34,7 @@ const mapPrintifyProduct = (product) => {
     title: product.title,
     description: product.description || '',
     imageUrl,
+    visible: product.visible,
     variants: (product.variants || [])
       .filter((variant) => variant.is_enabled)
       .map((variant) => ({
@@ -64,7 +65,7 @@ export const syncPrintifyCatalog = async (force = false) => {
   }
 
   const { data } = await printifyClient.get(`/shops/${env.PRINTIFY_SHOP_ID}/products.json`);
-  const products = (data?.data || []).map(mapPrintifyProduct).filter((item) => item.variants.length > 0);
+  const products = (data?.data || []).map(mapPrintifyProduct).filter((item) => item.variants.length > 0 && item.visible);
 
   await ApparelCatalogCache.findOneAndUpdate(
     { source: 'printify' },

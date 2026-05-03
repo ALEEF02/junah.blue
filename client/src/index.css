@@ -5,11 +5,12 @@
 @tailwind utilities;
 
 :root {
-  --bg-main: #efefec;
-  --text-main: #030A3F;
+  --bg-main: #FDFCE8;
+  --text-main: #242321;
   --brand-dark: #023C85;
   --brand-mid: #0172B0;
   --brand-light: #89D6E8;
+  --brand-paper: #fbf8f1;
 }
 
 html,
@@ -30,6 +31,7 @@ h2,
 h3,
 h4 {
   font-family: 'Aladin', cursive;
+  color: var(--brand-dark);
 }
 
 .font-mono {
@@ -55,4 +57,13 @@ small {
 small {
   font-size: 1.15em;
   line-height: 1.1;
+}
+
+p,
+li,
+label,
+input,
+select,
+textarea {
+  color: var(--text-main);
 }

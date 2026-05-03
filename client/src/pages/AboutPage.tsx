@@ -1,114 +1,47 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { api } from '../lib/api';
-import { ArtistProfile } from '../types/api';
+import React from 'react';
+import coreShapeLogo from '../assets/logos/junah-core-shape.svg';
+import { PillCTA } from '../components/PillCTA';
+import { PlatformLinks } from '../components/PlatformLinks';
 import { SectionHeader } from '../components/SectionHeader';
+import { aboutFacts, coreModelCopy, homeBio } from '../content/junahContent';
 
 interface AboutPageProps {
   onNavigate: (path: string) => void;
 }
 
 export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
-  const [profile, setProfile] = useState<ArtistProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const load = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await api.getPublicProfile();
-        if (!cancelled) {
-          setProfile(response);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Unable to load biography');
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const hasSocialLinks = useMemo(() => {
-    if (!profile) return false;
-    return Boolean(profile.socialLinks.instagram || profile.socialLinks.youtube || profile.socialLinks.spotify);
-  }, [profile]);
-
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-10 md:px-6">
-      <SectionHeader
-        eyebrow="Biography"
-        title={profile?.headline || 'About Junah'}
-        description="Full artist background and story."
-      />
+      <SectionHeader eyebrow="About" title="Junah" />
 
-      {error ? <p className="rounded border border-red-300 bg-red-50 p-3 text-red-700">{error}</p> : null}
-      {loading ? <p className="text-brand-mid">Loading biography...</p> : null}
+      <section className="border border-brand-mid bg-brand-paper p-5 md:p-6">
+        <p className="max-w-3xl text-lg leading-relaxed text-brand-ink">{homeBio}</p>
+        <PlatformLinks className="mt-6" showLabels />
+      </section>
 
-      {profile ? (
-        <section className="border border-brand-mid bg-brand-light/10 p-5 md:p-6">
-          <h3 className="text-2xl text-brand-dark">{profile.name}</h3>
-          <p className="mt-4 whitespace-pre-wrap text-brand-mid">{profile.bio}</p>
+      <section className="grid gap-3 md:grid-cols-5">
+        {aboutFacts.map((fact) => (
+          <article key={fact.label} className="border border-brand-mid bg-brand-paper p-4">
+            <p className="text-xs uppercase tracking-[0.25em] text-brand-mid">{fact.label}</p>
+            <p className="mt-2 text-brand-ink">{fact.value}</p>
+          </article>
+        ))}
+      </section>
 
-          {hasSocialLinks ? (
-            <div className="mt-6 border-t border-brand-mid pt-4">
-              <p className="text-xs uppercase tracking-[0.2em] text-brand-mid">Connect</p>
-              <div className="mt-3 flex flex-wrap gap-3">
-                {profile.socialLinks.instagram ? (
-                  <a
-                    href={profile.socialLinks.instagram}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="border border-brand-mid px-4 py-2 text-brand-mid hover:bg-brand-light/20"
-                  >
-                    Instagram
-                  </a>
-                ) : null}
-                {profile.socialLinks.youtube ? (
-                  <a
-                    href={profile.socialLinks.youtube}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="border border-brand-mid px-4 py-2 text-brand-mid hover:bg-brand-light/20"
-                  >
-                    YouTube
-                  </a>
-                ) : null}
-                {profile.socialLinks.spotify ? (
-                  <a
-                    href={profile.socialLinks.spotify}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="border border-brand-mid px-4 py-2 text-brand-mid hover:bg-brand-light/20"
-                  >
-                    Spotify
-                  </a>
-                ) : null}
-              </div>
-            </div>
-          ) : null}
-        </section>
-      ) : null}
+      <section className="border border-brand-mid bg-brand-paper p-5 md:p-6">
+        <div className="mb-4 flex items-center gap-3">
+          <img src={coreShapeLogo} alt="" className="h-14 w-14 object-contain" />
+          <h2 className="font-mono text-4xl leading-none text-brand-dark md:text-5xl">The Core Model</h2>
+        </div>
+        <div className="space-y-4 text-lg leading-relaxed text-brand-ink">
+          {coreModelCopy.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
+      </section>
 
       <div className="flex flex-wrap gap-3">
-        <button onClick={() => onNavigate('/beats')} className="border border-brand-mid px-4 py-2 text-brand-mid hover:bg-brand-light/20">
-          Browse Beats
-        </button>
-        <button onClick={() => onNavigate('/apparel')} className="border border-brand-mid px-4 py-2 text-brand-mid hover:bg-brand-light/20">
-          Explore Apparel
-        </button>
+        <PillCTA label="Explore Apparel" onClick={() => onNavigate('/apparel')} />
       </div>
     </div>
   );

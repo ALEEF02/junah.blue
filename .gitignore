@@ -25,3 +25,11 @@ yarn-error.log*
 
 /website_references
 /deploy
+
+# Coding tools
+.codex
+.vscode
+
+junah logo final/
+*.pdf
+*.doc*

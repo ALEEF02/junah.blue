@@ -167,7 +167,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-cream text-brand-dark">
+    <div className="min-h-screen bg-brand-cream text-brand-ink">
       <Navbar path={path} onNavigate={navigate} isOwnerAuthed={Boolean(ownerUser)} onLogout={logout} />
       <main>{content}</main>
       <Footer onNavigate={navigate} />

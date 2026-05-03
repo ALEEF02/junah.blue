@@ -37,6 +37,7 @@ const normalizeColorText = (value: string) =>
     .replace(/[^a-z\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+
 const namedColorEntries = (colornames as Array<{ name: string; hex: string }>)
   .map((entry) => ({
     normalizedName: normalizeColorText(entry.name),
@@ -85,15 +86,12 @@ const pickBestColorMatch = (
 ) => {
   if (options.length === 0) return null;
 
-  // 1) Exact match
   const exactMatch = options.find((option) => option.normalizedName === normalizedTitle);
   if (exactMatch) return exactMatch;
 
-  // 2) First whole-word match
   const firstWholeWord = options.find((option) => option.wholeWord);
   if (firstWholeWord) return firstWholeWord;
 
-  // 3) Most letters
   return options.reduce((best, current) =>
     current.normalizedName.length > best.normalizedName.length ? current : best
   );
@@ -102,11 +100,8 @@ const pickBestColorMatch = (
 const extractStripeColors = (product: ApparelProduct) => {
   const foundColors: string[] = [];
 
-  console.log("Colors for " + product.title);
-
   product.variants.forEach((variant) => {
     const normalizedTitle = normalizeColorText(variant.title);
-    console.log("\t" + variant.title + " --> " + normalizedTitle);
 
     const options = namedColorEntries
       .map((entry) => {
@@ -132,7 +127,6 @@ const extractStripeColors = (product: ApparelProduct) => {
 
     const selected = pickBestColorMatch(normalizedTitle, options);
     if (selected && !foundColors.includes(selected.hex)) {
-      console.log("\t" + selected.normalizedName);
       foundColors.push(selected.hex);
     }
   });
@@ -235,6 +229,7 @@ export const ApparelPage: React.FC = () => {
       ];
     });
   };
+
   const onColorChange = (productId: string, color: string) => {
     const parsedVariants = productVariantMatrix[productId] || [];
 
@@ -254,6 +249,7 @@ export const ApparelPage: React.FC = () => {
       };
     });
   };
+
   const onSizeChange = (productId: string, size: string) => {
     const parsedVariants = productVariantMatrix[productId] || [];
 
@@ -318,11 +314,7 @@ export const ApparelPage: React.FC = () => {
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-10 md:px-6">
-      <SectionHeader
-        eyebrow="Merch"
-        title="Apparel"
-        description="Browse live apparel inventory and complete checkout directly on Junah.blue."
-      />
+      <SectionHeader eyebrow="Merch" title="Apparel" description="Browse Junah merch." />
 
       {error ? <p className="rounded border border-red-300 bg-red-50 p-3 text-red-700">{error}</p> : null}
 
@@ -353,7 +345,7 @@ export const ApparelPage: React.FC = () => {
             );
 
             return (
-              <article key={product.id} className="border border-brand-mid bg-brand-cream">
+              <article key={product.id} className="border border-brand-mid bg-brand-paper">
                 <div className="border-b border-brand-mid p-3">
                   <p className="font-semibold text-brand-dark">{selectedVariant?.title || 'Variant'}</p>
                   <div className="mt-2 flex gap-1">
@@ -368,7 +360,7 @@ export const ApparelPage: React.FC = () => {
                 </div>
 
                 <div className="aspect-square bg-brand-light/10">
-                  {(selectedVariant?.imageUrl || product.imageUrl) ? (
+                  {selectedVariant?.imageUrl || product.imageUrl ? (
                     <img
                       src={selectedVariant?.imageUrl || product.imageUrl}
                       alt={`${product.title} - ${selectedVariant?.title || 'Variant'}`}
@@ -452,7 +444,7 @@ export const ApparelPage: React.FC = () => {
             <p className="mt-3 text-lg text-brand-dark">Total: {formatCurrency(cartTotal)}</p>
             <button
               onClick={checkout}
-              className="mt-3 w-full rounded-full border border-brand-mid bg-brand-mid px-4 py-2 text-brand-cream hover:bg-brand-dark"
+              className="mt-3 w-full border border-brand-dark bg-brand-dark px-4 py-2 text-brand-cream transition hover:bg-brand-light hover:text-brand-dark"
             >
               Checkout Apparel
             </button>

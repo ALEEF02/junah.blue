@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { colornames } from 'color-name-list';
 import { api, formatCurrency } from '../lib/api';
 import { savePendingCheckout } from '../lib/checkoutFeedback';
@@ -139,6 +139,60 @@ const extractStripeColors = (product: ApparelProduct) => {
   }
 
   return expanded;
+};
+
+const ThreeDotLoader = () => (
+  <div className="flex items-center gap-1" aria-hidden="true">
+    {[0, 1, 2].map((dot) => (
+      <span
+        key={dot}
+        className="h-2 w-2 animate-bounce rounded-full bg-brand-dark"
+        style={{ animationDelay: `${dot * 120}ms` }}
+      />
+    ))}
+  </div>
+);
+
+interface ApparelImageProps {
+  imageUrl?: string;
+  alt: string;
+}
+
+const ApparelImage: React.FC<ApparelImageProps> = ({ imageUrl, alt }) => {
+  const imageRef = useRef<HTMLImageElement | null>(null);
+  const [imageLoading, setImageLoading] = useState(false);
+
+  useEffect(() => {
+    if (!imageUrl) {
+      setImageLoading(false);
+      return;
+    }
+
+    const image = imageRef.current;
+    setImageLoading(!image?.complete);
+  }, [imageUrl]);
+
+  return (
+    <div className="relative aspect-square bg-brand-light/10">
+      {imageUrl ? (
+        <img
+          ref={imageRef}
+          src={imageUrl}
+          alt={alt}
+          onLoad={() => setImageLoading(false)}
+          onError={() => setImageLoading(false)}
+          className={`h-full w-full object-cover transition-opacity duration-200 ${
+            imageLoading ? 'opacity-40' : 'opacity-100'
+          }`}
+        />
+      ) : null}
+      {imageLoading ? (
+        <div className="absolute inset-0 flex items-center justify-center bg-brand-paper/45">
+          <ThreeDotLoader />
+        </div>
+      ) : null}
+    </div>
+  );
 };
 
 export const ApparelPage: React.FC = () => {
@@ -359,15 +413,10 @@ export const ApparelPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="aspect-square bg-brand-light/10">
-                  {selectedVariant?.imageUrl || product.imageUrl ? (
-                    <img
-                      src={selectedVariant?.imageUrl || product.imageUrl}
-                      alt={`${product.title} - ${selectedVariant?.title || 'Variant'}`}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : null}
-                </div>
+                <ApparelImage
+                  imageUrl={selectedVariant?.imageUrl || product.imageUrl}
+                  alt={`${product.title} - ${selectedVariant?.title || 'Variant'}`}
+                />
 
                 <div className="space-y-3 p-3">
                   <h3 className="font-mono text-2xl leading-tight text-brand-dark">{product.title}</h3>

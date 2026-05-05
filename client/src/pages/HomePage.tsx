@@ -76,6 +76,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             alt="Junah"
             className="h-64 w-full max-w-md object-contain md:h-80"
           />
+          <p className="text-brand-ink">
+            So much music. An oversaturated market. Generative art.<br/>
+            Am I real enough yet?<br/>
+            Or will I be drowned in the noise?
+          </p>
           <PlatformLinks className="mt-4 justify-center" />
           <div className="mt-8 aspect-video w-full max-w-2xl overflow-hidden border border-brand-mid bg-brand-paper">
             <iframe

@@ -155,29 +155,44 @@ const ThreeDotLoader = () => (
 
 interface ApparelImageProps {
   imageUrl?: string;
+  images?: ApparelProduct['images'];
   alt: string;
 }
 
-const ApparelImage: React.FC<ApparelImageProps> = ({ imageUrl, alt }) => {
+const getPositionedImageUrl = (images: NonNullable<ApparelProduct['images']> = [], position: 'front' | 'back') =>
+  images.find((image) => image.position === position)?.src;
+
+const ApparelImage: React.FC<ApparelImageProps> = ({ imageUrl, images = [], alt }) => {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const [imageLoading, setImageLoading] = useState(false);
+  const [side, setSide] = useState<'front' | 'back'>('front');
+  const frontImageUrl = getPositionedImageUrl(images, 'front') || imageUrl;
+  const backImageUrl = getPositionedImageUrl(images, 'back');
+  const activeImageUrl = side === 'back' && backImageUrl ? backImageUrl : frontImageUrl;
+  const hasBackImage = Boolean(backImageUrl);
 
   useEffect(() => {
-    if (!imageUrl) {
+    if (!hasBackImage) {
+      setSide('front');
+    }
+  }, [hasBackImage, images]);
+
+  useEffect(() => {
+    if (!activeImageUrl) {
       setImageLoading(false);
       return;
     }
 
     const image = imageRef.current;
     setImageLoading(!image?.complete);
-  }, [imageUrl]);
+  }, [activeImageUrl]);
 
   return (
     <div className="relative aspect-square bg-brand-light/10">
-      {imageUrl ? (
+      {activeImageUrl ? (
         <img
           ref={imageRef}
-          src={imageUrl}
+          src={activeImageUrl}
           alt={alt}
           onLoad={() => setImageLoading(false)}
           onError={() => setImageLoading(false)}
@@ -185,6 +200,16 @@ const ApparelImage: React.FC<ApparelImageProps> = ({ imageUrl, alt }) => {
             imageLoading ? 'opacity-40' : 'opacity-100'
           }`}
         />
+      ) : null}
+      {hasBackImage ? (
+        <button
+          type="button"
+          onClick={() => setSide((current) => (current === 'front' ? 'back' : 'front'))}
+          className="absolute right-2 top-2 z-10 border border-brand-mid bg-brand-paper/90 px-2 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-brand-dark shadow-sm transition hover:bg-brand-light/40"
+          aria-label={`Show ${side === 'front' ? 'back' : 'front'} side`}
+        >
+          {side === 'front' ? 'Back ↺' : 'Front ↺'}
+        </button>
       ) : null}
       {imageLoading ? (
         <div className="absolute inset-0 flex items-center justify-center bg-brand-paper/45">
@@ -415,6 +440,7 @@ export const ApparelPage: React.FC = () => {
 
                 <ApparelImage
                   imageUrl={selectedVariant?.imageUrl || product.imageUrl}
+                  images={selectedVariant?.images?.length ? selectedVariant.images : product.images}
                   alt={`${product.title} - ${selectedVariant?.title || 'Variant'}`}
                 />
 

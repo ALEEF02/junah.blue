@@ -42,9 +42,15 @@ export interface ApparelVariant {
   id: number | string;
   title: string;
   imageUrl?: string;
+  images?: ApparelImage[];
   priceCents: number;
   sku: string;
   isAvailable: boolean;
+}
+
+export interface ApparelImage {
+  src: string;
+  position?: string;
 }
 
 export interface ApparelProduct {
@@ -52,6 +58,7 @@ export interface ApparelProduct {
   title: string;
   description: string;
   imageUrl: string;
+  images?: ApparelImage[];
   variants: ApparelVariant[];
 }
 

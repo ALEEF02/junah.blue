@@ -2,7 +2,7 @@ import { printifyClient } from '../config/printify.js';
 import { env, hasPrintifyConfigured } from '../config/env.js';
 import ApparelCatalogCache from '../models/ApparelCatalogCache.js';
 
-const APPAREL_CACHE_VERSION = 2;
+const APPAREL_CACHE_VERSION = 3;
 
 const assertPrintify = () => {
   if (!hasPrintifyConfigured || !printifyClient) {
@@ -10,14 +10,32 @@ const assertPrintify = () => {
   }
 };
 
-const matchVariantImage = (images, variantId, fallbackImageUrl) => {
+const getVariantImages = (images, variantId) => {
   const variantIdString = String(variantId);
-  const image =
-    images.find((entry) =>
-      Array.isArray(entry.variant_ids) && entry.variant_ids.some((id) => String(id) === variantIdString)
-    ) || null;
 
-  return image?.src || fallbackImageUrl;
+  return images
+    .filter((entry) =>
+      Array.isArray(entry.variant_ids) && entry.variant_ids.some((id) => String(id) === variantIdString)
+    )
+    .map((entry) => ({
+      src: entry.src,
+      position: String(entry.position || '').toLowerCase()
+    }))
+    .filter((entry) => entry.src);
+};
+
+const pickImageUrl = (images, fallbackImageUrl) => {
+  const frontImage = images.find((entry) => entry.position === 'front');
+  return frontImage?.src || images[0]?.src || fallbackImageUrl;
+};
+
+const getProductImages = (images = []) => {
+  return images
+    .map((entry) => ({
+      src: entry.src,
+      position: String(entry.position || '').toLowerCase()
+    }))
+    .filter((entry) => entry.src);
 };
 
 const hasVariantImages = (products = []) =>
@@ -26,7 +44,8 @@ const hasVariantImages = (products = []) =>
   );
 
 const mapPrintifyProduct = (product) => {
-  const imageUrl = product.images?.[0]?.src || '';
+  const productImages = getProductImages(product.images || []);
+  const imageUrl = pickImageUrl(productImages, product.images?.[0]?.src || '');
   const images = product.images || [];
 
   return {
@@ -34,17 +53,23 @@ const mapPrintifyProduct = (product) => {
     title: product.title,
     description: product.description || '',
     imageUrl,
+    images: productImages,
     visible: product.visible,
     variants: (product.variants || [])
       .filter((variant) => variant.is_enabled)
-      .map((variant) => ({
-        imageUrl: matchVariantImage(images, variant.id, imageUrl),
-        id: variant.id,
-        title: variant.title,
-        priceCents: variant.price,
-        sku: variant.sku || '',
-        isAvailable: variant.is_available
-      }))
+      .map((variant) => {
+        const variantImages = getVariantImages(images, variant.id);
+
+        return {
+          imageUrl: pickImageUrl(variantImages, imageUrl),
+          images: variantImages,
+          id: variant.id,
+          title: variant.title,
+          priceCents: variant.price,
+          sku: variant.sku || '',
+          isAvailable: variant.is_available
+        };
+      })
   };
 };
 

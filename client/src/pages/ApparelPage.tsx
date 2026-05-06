@@ -38,6 +38,7 @@ const normalizeColorText = (value: string) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+colornames.push({ name: "chili", hex: "#ac1e3a" });
 const namedColorEntries = (colornames as Array<{ name: string; hex: string }>)
   .map((entry) => ({
     normalizedName: normalizeColorText(entry.name),

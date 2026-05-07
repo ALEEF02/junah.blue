@@ -77,9 +77,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             className="h-64 w-full max-w-md object-contain md:h-80"
           />
           <p className="text-brand-ink">
-            So much music. An oversaturated market. Generative art.<br/>
+            so much music.<br className="md:hidden" /> <span className="hidden md:inline"> </span>
+            an oversaturated market.<br className="md:hidden" /> <span className="hidden md:inline"> </span>
+            generative art.<br/>
             AM I REAL ENOUGH YET?<br/>
-            Or will I be drowned in the noise?
+            or will i be drowned in the noise?
           </p>
           <PlatformLinks className="mt-4 justify-center" />
           <div className="mt-8 aspect-video w-full max-w-2xl overflow-hidden border border-brand-mid bg-brand-paper">
@@ -114,11 +116,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           <EditorialCard
             category="Apparel"
             title={featuredProduct.title}
-            description={
-              featuredVariant
-                ? `${formatCurrency(featuredVariant.priceCents)} starting. Browse Junah merch.`
-                : 'Browse Junah merch.'
-            }
+            description={'Browse Junah merch.'}
             imageUrl={featuredVariant?.imageUrl || featuredProduct.imageUrl}
             accent="text-brand-dark"
             onArrowClick={() => onNavigate('/apparel')}

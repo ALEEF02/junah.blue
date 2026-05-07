@@ -11,7 +11,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <div>
           <h3 className="text-5xl tracking-tight">Junah</h3>
           <p className="mt-3 max-w-sm text-brand-ink">
-            Singer, songwriter, and artist apparel from Los Angeles.
+            Singer, songwriter, recording artist.
           </p>
         </div>
         <div>

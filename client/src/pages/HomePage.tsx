@@ -78,7 +78,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           />
           <p className="text-brand-ink">
             So much music. An oversaturated market. Generative art.<br/>
-            Am I real enough yet?<br/>
+            AM I REAL ENOUGH YET?<br/>
             Or will I be drowned in the noise?
           </p>
           <PlatformLinks className="mt-4 justify-center" />

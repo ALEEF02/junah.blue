@@ -17,19 +17,19 @@ export interface PlatformLink {
 }
 
 export const homeBio =
-  'Junah is a singer/songwriter based in Los Angeles, CA. He mixes creative poetry with a masterful skill of melody to bring a refreshing and modern spin on R&B and Pop music.';
+  'Junah is a singer/songwriter based in Los Angeles. He mixes creative poetry with a masterful skill of melody to bring a refreshing and modern spin on R&B and Pop music.';
 
 export const aboutFacts = [
   { label: 'Who', value: 'Junah (aka Junah Blue)' },
-  { label: 'What', value: 'Singer / Songwriter / Producer' },
+  { label: 'What', value: 'Singer / Songwriter' },
   { label: 'Where', value: 'Los Angeles' },
   { label: 'When', value: 'Right here in the present all namaste and shit.' },
   { label: 'How', value: 'Motivational YouTube lifting videos and some Pranayama breathing.' }
 ];
 
 export const coreModelCopy = [
-  'My logo is the Core Model. The Core Model is a fundamental pattern of nature that first entered literature in the 1970s by permaculture researchers Bill Mollison and David Holmgren. In short, permaculture is a system of design principles that reflect the patterns of the natural world. Where this becomes useful is in agriculture. Permaculture systems have allowed farming to take new forms in which local ecosystems are less disrupted, maintenance is reduced, and crops are able to flourish easier.',
-  "I'm not claiming to be a permaculturist. At least not yet. Still, I can't help but draw inspiration from what the Core Model represents. Stopping to observe yields clarity in the underlying patterns. And there are patterns in everything. Human behavior, the branches of science, the flow of traffic, chess, economics. The same way I've listened to music, figured out the patterns, and replicated them to create great art myself, I also seek to find the underlying patterns and understand the basic principles in all aspects of life, including life itself. This is what the core model is. A foundational pattern that can be used to create prosperity and nourishment."
+  'The Core Model is a fundamental pattern of nature that first entered literature in the 1970s by permaculture researchers Bill Mollison and David Holmgren. In short, permaculture is a system of design principles that reflect the patterns of the natural world. Where this becomes useful is in agriculture. Permaculture systems have allowed farming to take new forms in which local ecosystems are less disrupted, maintenance is reduced, and crops are able to flourish easier.',
+  "I'm not claiming to be a permaculturist. At least not yet. Still, I can't help but draw inspiration from what the Core Model represents. Taking time to stop and observe allows us to find the patterns that life hides in plain sight. And if you notice, you'll see that there are patterns everywhere. Human behavior, the branches of science, the flow of traffic, chess, economics. The same way that I've studied music, figured out it's patterns, and utilized them to create great art, I still also seek to find the underlying patterns and understand the basic principles in all aspects of life, including life itself."
 ];
 
 export const platformLinks: PlatformLink[] = [

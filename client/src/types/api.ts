@@ -43,6 +43,10 @@ export interface ApparelVariant {
   title: string;
   imageUrl?: string;
   images?: ApparelImage[];
+  optionIds?: Array<number | string>;
+  color?: string;
+  size?: string;
+  colorHexes?: string[];
   priceCents: number;
   sku: string;
   isAvailable: boolean;

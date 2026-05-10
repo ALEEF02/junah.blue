@@ -49,7 +49,7 @@ const namedColorEntries = (colornames as Array<{ name: string; hex: string }>)
 const uniqueValues = (values: string[]) => Array.from(new Set(values.filter(Boolean)));
 const isSizeLabel = (value: string) => sizeLabelPattern.test(value.trim());
 
-const parseVariantDimensions = (title: string): ProductOptionSelection => {
+const parseVariantTitleDimensions = (title: string): ProductOptionSelection => {
   const parts = title
     .split('/')
     .map((part) => part.trim())
@@ -71,6 +71,15 @@ const parseVariantDimensions = (title: string): ProductOptionSelection => {
   return {
     color,
     size
+  };
+};
+
+const getVariantDimensions = (variant: ApparelProduct['variants'][number]): ProductOptionSelection => {
+  const parsed = parseVariantTitleDimensions(variant.title);
+
+  return {
+    color: variant.color || parsed.color,
+    size: variant.size || parsed.size
   };
 };
 
@@ -98,37 +107,51 @@ const pickBestColorMatch = (
   );
 };
 
+const getNamedColorHex = (color: string) => {
+  const normalizedTitle = normalizeColorText(color);
+  const options = namedColorEntries
+    .map((entry) => {
+      const index = normalizedTitle.indexOf(entry.normalizedName);
+      if (index === -1) return null;
+
+      return {
+        ...entry,
+        index,
+        wholeWord: isWholeWordMatch(normalizedTitle, entry.normalizedName, index)
+      };
+    })
+    .filter(
+      (
+        entry
+      ): entry is {
+        normalizedName: string;
+        hex: string;
+        index: number;
+        wholeWord: boolean;
+      } => Boolean(entry)
+    );
+
+  return pickBestColorMatch(normalizedTitle, options)?.hex;
+};
+
 const extractStripeColors = (product: ApparelProduct) => {
   const foundColors: string[] = [];
 
   product.variants.forEach((variant) => {
-    const normalizedTitle = normalizeColorText(variant.title);
+    if (variant.colorHexes?.length) {
+      variant.colorHexes.forEach((colorHex) => {
+        const normalizedHex = colorHex.toLowerCase();
+        if (!foundColors.includes(normalizedHex)) {
+          foundColors.push(normalizedHex);
+        }
+      });
+      return;
+    }
 
-    const options = namedColorEntries
-      .map((entry) => {
-        const index = normalizedTitle.indexOf(entry.normalizedName);
-        if (index === -1) return null;
-
-        return {
-          ...entry,
-          index,
-          wholeWord: isWholeWordMatch(normalizedTitle, entry.normalizedName, index)
-        };
-      })
-      .filter(
-        (
-          entry
-        ): entry is {
-          normalizedName: string;
-          hex: string;
-          index: number;
-          wholeWord: boolean;
-        } => Boolean(entry)
-      );
-
-    const selected = pickBestColorMatch(normalizedTitle, options);
-    if (selected && !foundColors.includes(selected.hex)) {
-      foundColors.push(selected.hex);
+    const fallbackColor = variant.color || getVariantDimensions(variant).color;
+    const fallbackHex = getNamedColorHex(fallbackColor);
+    if (fallbackHex && !foundColors.includes(fallbackHex)) {
+      foundColors.push(fallbackHex);
     }
   });
 
@@ -237,7 +260,7 @@ export const ApparelPage: React.FC = () => {
         setOptionSelection(
           response.products.reduce<Record<string, ProductOptionSelection>>((acc, product) => {
             if (product.variants[0]) {
-              acc[product.id] = parseVariantDimensions(product.variants[0].title);
+              acc[product.id] = getVariantDimensions(product.variants[0]);
             }
             return acc;
           }, {})
@@ -268,7 +291,7 @@ export const ApparelPage: React.FC = () => {
     () =>
       products.reduce<Record<string, ParsedVariant[]>>((acc, product) => {
         acc[product.id] = product.variants.map((variant) => {
-          const parsed = parseVariantDimensions(variant.title);
+          const parsed = getVariantDimensions(variant);
           return {
             variant,
             color: parsed.color,
@@ -280,7 +303,7 @@ export const ApparelPage: React.FC = () => {
     [products]
   );
 
-  const addToCart = (product: ApparelProduct, variant: ApparelProduct['variants'][number]) => {
+  const addToCart = (product: ApparelProduct, variant: ApparelProduct['variants'][number], variantLabel = variant.title) => {
     setCart((current) => {
       const existing = current.find(
         (item) => item.productId === product.id && String(item.variantId) === String(variant.id)
@@ -303,7 +326,7 @@ export const ApparelPage: React.FC = () => {
           productId: product.id,
           variantId: variant.id,
           quantity: 1,
-          label: `${product.title} - ${variant.title}`,
+          label: `${product.title} - ${variantLabel}`,
           amountCents: variant.priceCents
         }
       ];
@@ -423,11 +446,13 @@ export const ApparelPage: React.FC = () => {
                 .filter((entry) => !selectedColor || entry.color === selectedColor)
                 .map((entry) => entry.size)
             );
+            const selectedVariantLabel =
+              selectedColor && selectedSize ? `${selectedColor} / ${selectedSize}` : selectedVariant?.title || 'Variant';
 
             return (
               <article key={product.id} className="border border-brand-mid bg-brand-paper">
                 <div className="border-b border-brand-mid p-3">
-                  <p className="font-semibold text-brand-dark">{selectedVariant?.title || 'Variant'}</p>
+                  <p className="font-semibold text-brand-dark">{selectedVariantLabel}</p>
                   <div className="mt-2 flex gap-1">
                     {(productStripeColors[product.id] || stripeColors).map((color, stripeIndex) => (
                       <div
@@ -442,7 +467,7 @@ export const ApparelPage: React.FC = () => {
                 <ApparelImage
                   imageUrl={selectedVariant?.imageUrl || product.imageUrl}
                   images={selectedVariant?.images?.length ? selectedVariant.images : product.images}
-                  alt={`${product.title} - ${selectedVariant?.title || 'Variant'}`}
+                  alt={`${product.title} - ${selectedVariantLabel}`}
                 />
 
                 <div className="space-y-3 p-3">
@@ -479,7 +504,7 @@ export const ApparelPage: React.FC = () => {
                   </label>
 
                   <button
-                    onClick={() => selectedVariant && addToCart(product, selectedVariant)}
+                    onClick={() => selectedVariant && addToCart(product, selectedVariant, selectedVariantLabel)}
                     disabled={!selectedVariant}
                     className="w-full bg-brand-mid px-4 py-2 font-semibold text-brand-cream transition hover:bg-brand-dark"
                   >

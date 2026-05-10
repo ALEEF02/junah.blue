@@ -2,7 +2,7 @@ import { printifyClient } from '../config/printify.js';
 import { env, hasPrintifyConfigured } from '../config/env.js';
 import ApparelCatalogCache from '../models/ApparelCatalogCache.js';
 
-const APPAREL_CACHE_VERSION = 3;
+const APPAREL_CACHE_VERSION = 5;
 
 const assertPrintify = () => {
   if (!hasPrintifyConfigured || !printifyClient) {
@@ -38,6 +38,49 @@ const getProductImages = (images = []) => {
     .filter((entry) => entry.src);
 };
 
+const getOptionType = (option = {}) => {
+  const type = String(option.type || '').toLowerCase();
+  const name = String(option.name || '').toLowerCase();
+
+  if (type.includes('color') || name.includes('color')) return 'color';
+  if (type.includes('size') || name.includes('size')) return 'size';
+  return type || name;
+};
+
+const getProductOptionValueMap = (options = []) => {
+  const valueMap = new Map();
+
+  options.forEach((option) => {
+    const optionType = getOptionType(option);
+
+    (option.values || []).forEach((value) => {
+      valueMap.set(String(value.id), {
+        id: value.id,
+        type: optionType,
+        title: value.title,
+        colors: Array.isArray(value.colors) ? value.colors.filter(Boolean) : []
+      });
+    });
+  });
+
+  return valueMap;
+};
+
+const resolveVariantOptions = (optionValueMap, variantOptionIds = []) => {
+  const resolved = variantOptionIds
+    .map((optionId) => optionValueMap.get(String(optionId)))
+    .filter(Boolean);
+  const colorOption = resolved.find((option) => option.type === 'color');
+  const sizeOption = resolved.find((option) => option.type === 'size');
+
+  return {
+    optionIds: variantOptionIds,
+    color: colorOption?.title || '',
+    size: sizeOption?.title || '',
+    colorHexes: colorOption?.colors || []
+  };
+};
+
 const hasVariantImages = (products = []) =>
   products.every((product) =>
     (product.variants || []).every((variant) => typeof variant.imageUrl === 'string' && variant.imageUrl.length > 0)
@@ -47,6 +90,7 @@ const mapPrintifyProduct = (product) => {
   const productImages = getProductImages(product.images || []);
   const imageUrl = pickImageUrl(productImages, product.images?.[0]?.src || '');
   const images = product.images || [];
+  const optionValueMap = getProductOptionValueMap(product.options || []);
 
   return {
     id: product.id,
@@ -59,10 +103,12 @@ const mapPrintifyProduct = (product) => {
       .filter((variant) => variant.is_enabled)
       .map((variant) => {
         const variantImages = getVariantImages(images, variant.id);
+        const resolvedOptions = resolveVariantOptions(optionValueMap, variant.options || []);
 
         return {
           imageUrl: pickImageUrl(variantImages, imageUrl),
           images: variantImages,
+          ...resolvedOptions,
           id: variant.id,
           title: variant.title,
           priceCents: variant.price,

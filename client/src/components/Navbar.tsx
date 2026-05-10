@@ -26,7 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({ path, onNavigate }) => {
   return (
     <header className="sticky top-0 z-50 border-b border-brand-mid bg-white/95 backdrop-blur-md">
       <div className="mx-auto max-w-6xl px-4 py-3 md:px-6">
-        <div className="flex items-center justify-between gap-4">
+        <div className="relative flex items-center justify-between gap-4">
           <button
             onClick={() => onNavigate('/')}
             className="group h-14 w-36 overflow-hidden text-left md:w-44"
@@ -39,7 +39,7 @@ export const Navbar: React.FC<NavbarProps> = ({ path, onNavigate }) => {
             />
           </button>
 
-          <nav className="hidden items-center gap-6 md:flex">
+          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 md:flex">
             {navItems.map((item) => {
               const active = path === item.path;
               return (

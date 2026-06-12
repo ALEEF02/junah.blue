@@ -87,7 +87,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           <div className="mt-8 aspect-video w-full max-w-2xl overflow-hidden border border-brand-mid bg-brand-paper">
             <iframe
               className="h-full w-full"
-              src="https://www.youtube.com/embed/pwQE6jD1tKU"
+              src="https://www.youtube.com/embed/YGZNk_RnjuE"
               title="Junah video"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen

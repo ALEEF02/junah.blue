@@ -4,14 +4,8 @@ import { api, formatCurrency } from '../lib/api';
 import { savePendingCheckout } from '../lib/checkoutFeedback';
 import { ApparelProduct } from '../types/api';
 import { SectionHeader } from '../components/SectionHeader';
-
-interface CartItem {
-  productId: string;
-  variantId: string | number;
-  quantity: number;
-  label: string;
-  amountCents: number;
-}
+import { RotateCcw, X } from 'lucide-react';
+import { useApparelCart } from '../context/ApparelCartContext';
 
 interface ProductOptionSelection {
   color: string;
@@ -38,7 +32,7 @@ const normalizeColorText = (value: string) =>
     .replace(/\s+/g, ' ')
     .trim();
 
-colornames.push({ name: "chili", hex: "#ac1e3a" });
+colornames.push({ name: 'chili', hex: '#ac1e3a' });
 const namedColorEntries = (colornames as Array<{ name: string; hex: string }>)
   .map((entry) => ({
     normalizedName: normalizeColorText(entry.name),
@@ -74,12 +68,17 @@ const parseVariantTitleDimensions = (title: string): ProductOptionSelection => {
   };
 };
 
-const getVariantDimensions = (variant: ApparelProduct['variants'][number]): ProductOptionSelection => {
+const getVariantDimensions = (
+  variant: ApparelProduct['variants'][number],
+  product?: ApparelProduct
+): ProductOptionSelection => {
   const parsed = parseVariantTitleDimensions(variant.title);
+  const productHasColor = product?.hasColorOption ?? product?.variants.some((entry) => Boolean(entry.color));
+  const productHasSize = product?.hasSizeOption ?? product?.variants.some((entry) => Boolean(entry.size));
 
   return {
-    color: variant.color || parsed.color,
-    size: variant.size || parsed.size
+    color: productHasColor === false ? '' : variant.color || parsed.color,
+    size: productHasSize === false ? '' : variant.size || parsed.size
   };
 };
 
@@ -135,6 +134,9 @@ const getNamedColorHex = (color: string) => {
 };
 
 const extractStripeColors = (product: ApparelProduct) => {
+  const hasColorOption = product.hasColorOption ?? product.variants.some((variant) => Boolean(variant.color));
+  if (!hasColorOption) return [];
+
   const foundColors: string[] = [];
 
   product.variants.forEach((variant) => {
@@ -148,7 +150,7 @@ const extractStripeColors = (product: ApparelProduct) => {
       return;
     }
 
-    const fallbackColor = variant.color || getVariantDimensions(variant).color;
+    const fallbackColor = variant.color || getVariantDimensions(variant, product).color;
     const fallbackHex = getNamedColorHex(fallbackColor);
     if (fallbackHex && !foundColors.includes(fallbackHex)) {
       foundColors.push(fallbackHex);
@@ -170,7 +172,7 @@ const ThreeDotLoader = () => (
     {[0, 1, 2].map((dot) => (
       <span
         key={dot}
-        className="h-2 w-2 animate-bounce rounded-full bg-brand-dark"
+          className="h-2 w-2 animate-bounce rounded-full bg-apparel-red"
         style={{ animationDelay: `${dot * 120}ms` }}
       />
     ))}
@@ -229,14 +231,15 @@ const ApparelImage: React.FC<ApparelImageProps> = ({ imageUrl, images = [], alt 
         <button
           type="button"
           onClick={() => setSide((current) => (current === 'front' ? 'back' : 'front'))}
-          className="absolute right-2 top-2 z-10 border border-brand-mid bg-brand-paper/90 px-2 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-brand-dark shadow-sm transition hover:bg-brand-light/40"
+          className="absolute right-2 top-2 z-10 flex h-10 w-10 items-center justify-center bg-apparel-red text-white shadow-sm transition hover:bg-apparel-red-dark"
           aria-label={`Show ${side === 'front' ? 'back' : 'front'} side`}
+          title={`Show ${side === 'front' ? 'back' : 'front'} side`}
         >
-          {side === 'front' ? 'Back ↺' : 'Front ↺'}
+          <RotateCcw className={`h-5 w-5 transition-transform ${side === 'back' ? 'rotate-180' : ''}`} />
         </button>
       ) : null}
       {imageLoading ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-brand-paper/45">
+        <div className="absolute inset-0 flex items-center justify-center bg-white/50">
           <ThreeDotLoader />
         </div>
       ) : null}
@@ -247,7 +250,7 @@ const ApparelImage: React.FC<ApparelImageProps> = ({ imageUrl, images = [], alt 
 export const ApparelPage: React.FC = () => {
   const [products, setProducts] = useState<ApparelProduct[]>([]);
   const [optionSelection, setOptionSelection] = useState<Record<string, ProductOptionSelection>>({});
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const { cart, cartTotal, addItem, removeItem } = useApparelCart();
   const [buyerEmail, setBuyerEmail] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -260,7 +263,7 @@ export const ApparelPage: React.FC = () => {
         setOptionSelection(
           response.products.reduce<Record<string, ProductOptionSelection>>((acc, product) => {
             if (product.variants[0]) {
-              acc[product.id] = getVariantDimensions(product.variants[0]);
+              acc[product.id] = getVariantDimensions(product.variants[0], product);
             }
             return acc;
           }, {})
@@ -275,10 +278,6 @@ export const ApparelPage: React.FC = () => {
     load();
   }, []);
 
-  const cartTotal = useMemo(
-    () => cart.reduce((sum, item) => sum + item.amountCents * item.quantity, 0),
-    [cart]
-  );
   const productStripeColors = useMemo(
     () =>
       products.reduce<Record<string, string[]>>((acc, product) => {
@@ -291,7 +290,7 @@ export const ApparelPage: React.FC = () => {
     () =>
       products.reduce<Record<string, ParsedVariant[]>>((acc, product) => {
         acc[product.id] = product.variants.map((variant) => {
-          const parsed = getVariantDimensions(variant);
+          const parsed = getVariantDimensions(variant, product);
           return {
             variant,
             color: parsed.color,
@@ -304,32 +303,11 @@ export const ApparelPage: React.FC = () => {
   );
 
   const addToCart = (product: ApparelProduct, variant: ApparelProduct['variants'][number], variantLabel = variant.title) => {
-    setCart((current) => {
-      const existing = current.find(
-        (item) => item.productId === product.id && String(item.variantId) === String(variant.id)
-      );
-
-      if (existing) {
-        return current.map((item) =>
-          item === existing
-            ? {
-                ...item,
-                quantity: Math.min(item.quantity + 1, 10)
-              }
-            : item
-        );
-      }
-
-      return [
-        ...current,
-        {
-          productId: product.id,
-          variantId: variant.id,
-          quantity: 1,
-          label: `${product.title} - ${variantLabel}`,
-          amountCents: variant.priceCents
-        }
-      ];
+    addItem({
+      productId: product.id,
+      variantId: variant.id,
+      label: `${product.title}${variantLabel ? ` - ${variantLabel}` : ''}`,
+      amountCents: variant.priceCents
     });
   };
 
@@ -412,12 +390,16 @@ export const ApparelPage: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="mx-auto max-w-6xl px-4 py-10 md:px-6">Loading apparel...</div>;
+    return <div className="mx-auto max-w-6xl px-4 py-10 text-apparel-red md:px-6">Loading apparel...</div>;
   }
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-10 md:px-6">
-      <SectionHeader eyebrow="Merch" title="Apparel" description="Browse Junah merch." />
+      <SectionHeader
+        title="APPAREL"
+        description="Browse Junah merch."
+        titleClassName="text-apparel-red"
+      />
 
       {error ? <p className="rounded border border-red-300 bg-red-50 p-3 text-red-700">{error}</p> : null}
 
@@ -447,13 +429,19 @@ export const ApparelPage: React.FC = () => {
                 .map((entry) => entry.size)
             );
             const selectedVariantLabel =
-              selectedColor && selectedSize ? `${selectedColor} / ${selectedSize}` : selectedVariant?.title || 'Variant';
+              [selectedColor, selectedSize].filter(Boolean).join(' / ') || selectedVariant?.title || 'Variant';
+            const hasColorOption =
+              product.hasColorOption ?? parsedVariants.some((entry) => Boolean(entry.color));
+            const hasSizeOption =
+              product.hasSizeOption ?? parsedVariants.some((entry) => Boolean(entry.size));
+            const showColorSelect = hasColorOption && uniqueValues(parsedVariants.map((entry) => entry.color)).length > 1;
+            const showSizeSelect = hasSizeOption && uniqueValues(parsedVariants.map((entry) => entry.size)).length > 1;
 
             return (
-              <article key={product.id} className="border border-brand-mid bg-brand-paper">
-                <div className="border-b border-brand-mid p-3">
-                  <p className="font-semibold text-brand-dark">{selectedVariantLabel}</p>
-                  <div className="mt-2 flex gap-1">
+              <article key={product.id} className="border border-apparel-red bg-white">
+                <div className="border-b border-apparel-red p-3">
+                  <p className="font-semibold text-brand-ink">{selectedVariantLabel}</p>
+                  {(productStripeColors[product.id] || []).length ? <div className="mt-2 flex gap-1">
                     {(productStripeColors[product.id] || stripeColors).map((color, stripeIndex) => (
                       <div
                         key={`${product.id}-${color}-${stripeIndex}`}
@@ -461,7 +449,7 @@ export const ApparelPage: React.FC = () => {
                         className="h-1 w-full"
                       />
                     ))}
-                  </div>
+                  </div> : null}
                 </div>
 
                 <ApparelImage
@@ -471,14 +459,14 @@ export const ApparelPage: React.FC = () => {
                 />
 
                 <div className="space-y-3 p-3">
-                  <h3 className="font-mono text-2xl leading-tight text-brand-dark">{product.title}</h3>
+                  <h3 className="font-mono text-2xl leading-tight text-brand-ink">{product.title}</h3>
 
-                  <label className="block text-sm">
-                    <span className="mb-1 block uppercase tracking-[0.2em] text-brand-mid">Color</span>
+                  {showColorSelect ? <label className="block text-sm">
+                    <span className="mb-1 block uppercase text-apparel-red">Color</span>
                     <select
                       value={selectedColor}
                       onChange={(e) => onColorChange(product.id, e.target.value)}
-                      className="w-full border border-brand-mid bg-brand-light/10 px-2 py-2"
+                      className="w-full border border-apparel-red bg-white px-2 py-2 focus:border-apparel-red-dark"
                     >
                       {availableColors.map((color) => (
                         <option key={`${product.id}-color-${color}`} value={color}>
@@ -486,14 +474,14 @@ export const ApparelPage: React.FC = () => {
                         </option>
                       ))}
                     </select>
-                  </label>
+                  </label> : null}
 
-                  <label className="block text-sm">
-                    <span className="mb-1 block uppercase tracking-[0.2em] text-brand-mid">Size</span>
+                  {showSizeSelect ? <label className="block text-sm">
+                    <span className="mb-1 block uppercase text-apparel-red">Size</span>
                     <select
                       value={selectedSize}
                       onChange={(e) => onSizeChange(product.id, e.target.value)}
-                      className="w-full border border-brand-mid bg-brand-light/10 px-2 py-2"
+                      className="w-full border border-apparel-red bg-white px-2 py-2 focus:border-apparel-red-dark"
                     >
                       {availableSizes.map((size) => (
                         <option key={`${product.id}-size-${size}`} value={size}>
@@ -501,12 +489,12 @@ export const ApparelPage: React.FC = () => {
                         </option>
                       ))}
                     </select>
-                  </label>
+                  </label> : null}
 
                   <button
                     onClick={() => selectedVariant && addToCart(product, selectedVariant, selectedVariantLabel)}
                     disabled={!selectedVariant}
-                    className="w-full bg-brand-mid px-4 py-2 font-semibold text-brand-cream transition hover:bg-brand-dark"
+                    className="w-full bg-apparel-red px-4 py-3 font-semibold text-white transition hover:bg-apparel-red-dark disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Add To Cart {selectedVariant ? `- ${formatCurrency(selectedVariant.priceCents)}` : ''}
                   </button>
@@ -516,36 +504,47 @@ export const ApparelPage: React.FC = () => {
           })}
         </div>
 
-        <aside className="h-fit border border-brand-mid bg-brand-light/10 p-4">
-          <h3 className="font-mono text-3xl text-brand-dark">Cart</h3>
+        <aside id="cart" className="h-fit border border-apparel-red bg-brand-gray p-4">
+          <h3 className="font-mono text-3xl text-apparel-red">Cart</h3>
           <div className="mt-3 space-y-3">
-            {cart.length === 0 ? <p className="text-brand-mid">No items yet.</p> : null}
+            {cart.length === 0 ? <p className="text-brand-ink">No items yet.</p> : null}
             {cart.map((item, idx) => (
-              <div key={`${item.productId}-${item.variantId}-${idx}`} className="border border-brand-mid p-2">
-                <p className="text-sm text-brand-dark">{item.label}</p>
-                <p className="text-sm text-brand-mid">
-                  Qty {item.quantity} - {formatCurrency(item.amountCents)} each
-                </p>
+              <div key={`${item.productId}-${item.variantId}-${idx}`} className="flex gap-2 border border-apparel-red bg-white p-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-brand-ink">{item.label}</p>
+                  <p className="text-sm text-brand-ink/70">
+                    Qty {item.quantity} - {formatCurrency(item.amountCents)} each
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeItem(item.productId, item.variantId)}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center text-apparel-red transition hover:bg-apparel-red hover:text-white"
+                  aria-label={`Remove ${item.label} from cart`}
+                  title="Remove item"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
             ))}
           </div>
 
-          <div className="mt-4 border-t border-brand-mid pt-3">
+          <div className="mt-4 border-t border-apparel-red pt-3">
             <label className="block text-sm">
-              <span className="mb-1 block uppercase tracking-[0.2em] text-brand-mid">Receipt Email (optional)</span>
+              <span className="mb-1 block uppercase text-apparel-red">Receipt Email (optional)</span>
               <input
                 type="email"
                 value={buyerEmail}
                 onChange={(e) => setBuyerEmail(e.target.value)}
-                className="w-full border border-brand-mid px-2 py-2"
+                className="w-full border border-apparel-red px-2 py-2"
                 placeholder="you@example.com"
               />
             </label>
 
-            <p className="mt-3 text-lg text-brand-dark">Total: {formatCurrency(cartTotal)}</p>
+            <p className="mt-3 text-lg text-brand-ink">Total: {formatCurrency(cartTotal)}</p>
             <button
               onClick={checkout}
-              className="mt-3 w-full border border-brand-dark bg-brand-dark px-4 py-2 text-brand-cream transition hover:bg-brand-light hover:text-brand-dark"
+              className="mt-3 w-full bg-apparel-red px-4 py-3 text-white transition hover:bg-apparel-red-dark disabled:opacity-50"
             >
               Checkout Apparel
             </button>

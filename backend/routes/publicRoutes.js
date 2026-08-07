@@ -9,9 +9,11 @@ import {
   getPublicBeatById,
   getPublicBeats,
   getPublicProfile,
+  registerActivationSubscriber,
   signContract
 } from '../controllers/publicController.js';
 import { validateBody } from '../middleware/validate.js';
+import { activationRateLimit } from '../middleware/activationRateLimit.js';
 
 const router = Router();
 
@@ -46,7 +48,21 @@ const ApparelCheckoutSchema = z.object({
     .min(1)
 });
 
+const ActivationSchema = z.object({
+  fullName: z.string().trim().min(2).max(120),
+  email: z.email().max(254),
+  phone: z
+    .string()
+    .trim()
+    .min(7)
+    .max(30)
+    .regex(/^[+()\-\s.\d]+$/, 'Enter a valid phone number'),
+  acceptedTerms: z.literal(true),
+  website: z.string().max(0).optional()
+});
+
 router.get('/profile', getPublicProfile);
+router.post('/activation', activationRateLimit, validateBody(ActivationSchema), registerActivationSubscriber);
 router.get('/beats', getPublicBeats);
 router.get('/beats/:beatId', getPublicBeatById);
 router.get('/contracts/templates', getContractTemplates);

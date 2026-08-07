@@ -3,6 +3,7 @@ import ArtistProfile from '../models/ArtistProfile.js';
 import ContractTemplate from '../models/ContractTemplate.js';
 import SignedAgreement from '../models/SignedAgreement.js';
 import Order from '../models/Order.js';
+import ActivationSubscriber from '../models/ActivationSubscriber.js';
 import { getBeatSignedReadUrl } from '../services/s3Service.js';
 import { createBeatCheckoutSession, createApparelCheckoutSession } from '../services/stripeService.js';
 import { syncPrintifyCatalog } from '../services/printifyService.js';
@@ -41,6 +42,32 @@ export const getPublicProfile = async (_req, res) => {
   }
 
   return res.status(200).json(profile);
+};
+
+export const registerActivationSubscriber = async (req, res) => {
+  const { fullName, email, phone, acceptedTerms } = req.validatedBody;
+  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedPhone = phone.trim().replace(/\s+/g, ' ');
+  const existing = await ActivationSubscriber.findOne({ email: normalizedEmail }).select('_id').lean();
+
+  await ActivationSubscriber.findOneAndUpdate(
+    { email: normalizedEmail },
+    {
+      $set: {
+        fullName: fullName.trim(),
+        phone: normalizedPhone,
+        acceptedTerms,
+        termsVersion: '2026-08-07',
+        source: 'website-activate'
+      },
+      $setOnInsert: { email: normalizedEmail }
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
+
+  return res.status(existing ? 200 : 201).json({
+    status: existing ? 'updated' : 'registered'
+  });
 };
 
 export const getPublicBeats = async (_req, res) => {

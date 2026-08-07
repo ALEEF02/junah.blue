@@ -3,7 +3,10 @@ import './App.css';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { HomePage } from './pages/HomePage';
-import { AboutPage } from './pages/AboutPage';
+import { MusicPage } from './pages/MusicPage';
+import { EventsPage } from './pages/EventsPage';
+import { ActivatePage } from './pages/ActivatePage';
+import { TermsPage } from './pages/TermsPage';
 import { BeatsPage } from './pages/BeatsPage';
 import { ApparelPage } from './pages/ApparelPage';
 import { LicensingPage } from './pages/LicensingPage';
@@ -18,6 +21,7 @@ import {
   pendingCheckoutToOrder
 } from './lib/checkoutFeedback';
 import { CheckoutFeedbackModal } from './components/CheckoutFeedbackModal';
+import { ApparelCartProvider, useApparelCart } from './context/ApparelCartContext';
 
 const NotFoundPage: React.FC = () => (
   <div className="mx-auto max-w-4xl px-4 py-16 md:px-6">
@@ -27,8 +31,9 @@ const NotFoundPage: React.FC = () => (
   </div>
 );
 
-function App() {
-  const { path, navigate } = usePathRouter();
+function AppContent() {
+  const { path, navigate, replace } = usePathRouter();
+  const { clearCart } = useApparelCart();
   const [ownerUser, setOwnerUser] = useState<OwnerUser | null>(null);
   const [checkoutModal, setCheckoutModal] = useState<{
     outcome: 'success' | 'failure';
@@ -37,6 +42,12 @@ function App() {
     message?: string;
   } | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  useEffect(() => {
+    if (path === '/about') {
+      replace('/music');
+    }
+  }, [path, replace]);
 
   useEffect(() => {
     api
@@ -102,6 +113,9 @@ function App() {
       }
 
       if (!cancelled) {
+        if (normalized === 'success') {
+          clearCart();
+        }
         setCheckoutModal({
           outcome: normalized,
           sessionId,
@@ -122,13 +136,16 @@ function App() {
     return () => {
       cancelled = true;
     };
-  }, [path]);
+  }, [path, clearCart]);
 
   const content = useMemo(() => {
     if (path === '/') return <HomePage onNavigate={navigate} />;
-    if (path === '/about') return <AboutPage onNavigate={navigate} />;
+    if (path === '/music' || path === '/about') return <MusicPage />;
+    if (path === '/events') return <EventsPage />;
     if (path === '/beats') return <BeatsPage onNavigate={navigate}/>;
     if (path === '/apparel') return <ApparelPage />;
+    if (path === '/activate') return <ActivatePage onNavigate={navigate} />;
+    if (path === '/terms') return <TermsPage />;
     if (path === '/licensing') return <LicensingPage />;
     if (path === '/login') {
       return (
@@ -167,7 +184,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-cream text-brand-ink">
+    <div className="min-h-screen bg-white text-brand-ink">
       <Navbar path={path} onNavigate={navigate} isOwnerAuthed={Boolean(ownerUser)} onLogout={logout} />
       <main>{content}</main>
       <Footer onNavigate={navigate} />
@@ -183,5 +200,11 @@ function App() {
     </div>
   );
 }
+
+const App: React.FC = () => (
+  <ApparelCartProvider>
+    <AppContent />
+  </ApparelCartProvider>
+);
 
 export default App;

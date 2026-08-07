@@ -27,7 +27,7 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use('/api/webhooks', webhookRoutes);
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({ limit: '256kb' }));
 
 configRoutes(app);
 

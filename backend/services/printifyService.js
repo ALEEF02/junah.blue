@@ -2,7 +2,7 @@ import { printifyClient } from '../config/printify.js';
 import { env, hasPrintifyConfigured } from '../config/env.js';
 import ApparelCatalogCache from '../models/ApparelCatalogCache.js';
 
-const APPAREL_CACHE_VERSION = 5;
+const APPAREL_CACHE_VERSION = 6;
 
 const assertPrintify = () => {
   if (!hasPrintifyConfigured || !printifyClient) {
@@ -91,6 +91,7 @@ const mapPrintifyProduct = (product) => {
   const imageUrl = pickImageUrl(productImages, product.images?.[0]?.src || '');
   const images = product.images || [];
   const optionValueMap = getProductOptionValueMap(product.options || []);
+  const optionTypes = (product.options || []).map(getOptionType);
 
   return {
     id: product.id,
@@ -98,6 +99,8 @@ const mapPrintifyProduct = (product) => {
     description: product.description || '',
     imageUrl,
     images: productImages,
+    hasColorOption: optionTypes.includes('color'),
+    hasSizeOption: optionTypes.includes('size'),
     visible: product.visible,
     variants: (product.variants || [])
       .filter((variant) => variant.is_enabled)

@@ -6,6 +6,9 @@ interface PlatformLinksProps {
   links?: PlatformLink[];
   className?: string;
   showLabels?: boolean;
+  iconOnly?: boolean;
+  linkClassName?: string;
+  onLinkClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
 const AmazonIcon = () => (
@@ -51,14 +54,24 @@ const TidalIcon = () => (
   </svg>
 );
 
+const YouTubeMusicIcon = () => (
+  <span className="relative inline-flex h-5 w-5 items-center justify-center" aria-hidden="true">
+    <Youtube className="h-5 w-5" />
+    <span className="absolute -bottom-1 -right-1 rounded-full bg-brand-ink p-0.5">
+      <Music2 className="h-2.5 w-2.5 text-white" />
+    </span>
+  </span>
+);
+
 const getIcon = (link: PlatformLink) => {
-  if (link.label === 'Instagram') return <Instagram className="h-4 w-4" />;
-  if (link.label === 'YouTube' || link.label === 'YouTube Music') return <Youtube className="h-4 w-4" />;
-  if (link.label === 'Apple Music') return <AppleMusicIcon />;
-  if (link.label === 'Amazon Music') return <AmazonIcon />;
-  if (link.label === 'Bandcamp') return <BandcampIcon />;
-  if (link.label === 'Spotify') return <SpotifyIcon />;
-  if (link.label === 'Tidal') return <TidalIcon />;
+  if (link.label.includes('Instagram')) return <Instagram className="h-4 w-4" />;
+  if (link.label.includes('YouTube Music')) return <YouTubeMusicIcon />;
+  if (link.label.includes('YouTube')) return <Youtube className="h-4 w-4" />;
+  if (link.label.includes('Apple Music')) return <AppleMusicIcon />;
+  if (link.label.includes('Amazon Music')) return <AmazonIcon />;
+  if (link.label.includes('Bandcamp')) return <BandcampIcon />;
+  if (link.label.includes('Spotify')) return <SpotifyIcon />;
+  if (link.label.includes('Tidal')) return <TidalIcon />;
   if (link.kind === 'music') return <Music2 className="h-4 w-4" />;
   return <ExternalLink className="h-4 w-4" />;
 };
@@ -66,7 +79,10 @@ const getIcon = (link: PlatformLink) => {
 export const PlatformLinks: React.FC<PlatformLinksProps> = ({
   links = platformLinks,
   className = '',
-  showLabels = false
+  showLabels = false,
+  iconOnly = false,
+  linkClassName = '',
+  onLinkClick
 }) => {
   return (
     <div className={`flex flex-wrap items-center gap-2 ${className}`}>
@@ -78,10 +94,13 @@ export const PlatformLinks: React.FC<PlatformLinksProps> = ({
           rel="noreferrer"
           aria-label={`Open ${link.label}`}
           title={link.label}
-          className="inline-flex min-h-11 items-center gap-2 border border-brand-mid bg-brand-paper px-3 py-2 text-sm font-semibold text-brand-dark transition hover:-translate-y-0.5 hover:bg-brand-light/25 hover:text-brand-mid"
+          onClick={onLinkClick}
+          className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-2 text-sm font-semibold transition hover:-translate-y-0.5 ${
+            iconOnly ? 'bg-transparent p-2' : 'bg-brand-gray px-3 py-2 text-brand-ink'
+          } ${linkClassName}`}
         >
           {getIcon(link)}
-          <span>{showLabels ? link.label : link.shortLabel}</span>
+          {!iconOnly ? <span>{showLabels ? link.label : link.shortLabel}</span> : null}
         </a>
       ))}
     </div>

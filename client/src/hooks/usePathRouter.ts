@@ -15,11 +15,17 @@ export const usePathRouter = () => {
     setPath(nextPath);
   }, [path]);
 
+  const replace = useCallback((nextPath: string) => {
+    window.history.replaceState({}, '', nextPath);
+    setPath(nextPath);
+  }, []);
+
   return useMemo(
     () => ({
       path,
-      navigate
+      navigate,
+      replace
     }),
-    [path, navigate]
+    [path, navigate, replace]
   );
 };

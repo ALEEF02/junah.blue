@@ -63,7 +63,29 @@ export interface ApparelProduct {
   description: string;
   imageUrl: string;
   images?: ApparelImage[];
+  hasColorOption?: boolean;
+  hasSizeOption?: boolean;
   variants: ApparelVariant[];
+}
+
+export interface ApparelCartItem {
+  productId: string;
+  variantId: string | number;
+  quantity: number;
+  label: string;
+  amountCents: number;
+}
+
+export interface ActivationRegistration {
+  fullName: string;
+  email: string;
+  phone: string;
+  acceptedTerms: true;
+  website?: string;
+}
+
+export interface ActivationResponse {
+  status: 'registered' | 'updated';
 }
 
 export interface OwnerUser {

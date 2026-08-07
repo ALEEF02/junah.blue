@@ -27,7 +27,7 @@ export const CheckoutFeedbackModal: React.FC<CheckoutFeedbackModalProps> = ({
   const isSuccess = outcome === 'success';
 
   return (
-    <div className="fixed inset-0 z-[120] bg-brand-dark/55 px-4 py-8">
+    <div className="fixed inset-0 z-[120] bg-brand-dark/50 px-4 py-8">
       <div className="mx-auto max-w-2xl border border-brand-mid bg-brand-cream p-5 md:p-7">
         <div className="flex items-start justify-between gap-4">
           <div>

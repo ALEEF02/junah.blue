@@ -1,5 +1,7 @@
 import {
   ApparelProduct,
+  ActivationRegistration,
+  ActivationResponse,
   ArtistProfile,
   Beat,
   CheckoutStatusResponse,
@@ -55,6 +57,11 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
 
 export const api = {
   getPublicProfile: () => request<ArtistProfile>('/api/public/profile'),
+  registerActivation: (payload: ActivationRegistration) =>
+    request<ActivationResponse>('/api/public/activation', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
   getPublicBeats: () => request<{ beats: Beat[] }>('/api/public/beats'),
   getPublicBeatById: (beatId: string) => request<Beat>(`/api/public/beats/${beatId}`),
   getContracts: () => request<{ templates: ContractTemplate[] }>('/api/public/contracts/templates'),

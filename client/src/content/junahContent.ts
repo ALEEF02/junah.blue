@@ -6,6 +6,8 @@ import heroPhoto6 from '../assets/photos/image19.jpg';
 import heroPhoto7 from '../assets/photos/image20.jpg';
 import heroPhoto8 from '../assets/photos/image21.jpg';
 import heroPhoto9 from '../assets/photos/image22.jpg';
+import roscoeArtwork from '../assets/releases/roscoe-family-dinner.jpg';
+import moveSoftArtwork from '../assets/releases/move-soft.jpg';
 
 export type PlatformKind = 'music' | 'social';
 
@@ -14,6 +16,15 @@ export interface PlatformLink {
   shortLabel: string;
   href: string;
   kind: PlatformKind;
+}
+
+export interface MusicRelease {
+  title: string;
+  artwork: string;
+  artworkAlt: string;
+  titleClassName: string;
+  linkClassName: string;
+  links: PlatformLink[];
 }
 
 export const homeBio =
@@ -80,6 +91,93 @@ export const platformLinks: PlatformLink[] = [
     shortLabel: 'YOUTUBE',
     href: 'https://www.youtube.com/@Junahblue',
     kind: 'social'
+  }
+];
+
+export const musicReleases: MusicRelease[] = [
+  {
+    title: 'ROSCOE FAMILY DINNER',
+    artwork: roscoeArtwork,
+    artworkAlt: 'Roscoe Family Dinner release artwork showing a family gathered around a dinner table',
+    titleClassName: 'text-black',
+    linkClassName: 'text-black',
+    links: [
+      {
+        label: 'Roscoe Family Dinner on YouTube Music',
+        shortLabel: 'YT MUSIC',
+        href: 'https://music.youtube.com/playlist?list=OLAK5uy_mARBuR9J5LojiJehy-X2F9EDIy7ms11sw&si=d8yZDRMw8gqY3ZVT',
+        kind: 'music'
+      },
+      {
+        label: 'Roscoe Family Dinner on Apple Music',
+        shortLabel: 'APPLE MUSIC',
+        href: 'https://music.apple.com/us/album/roscoe-family-dinner/1895757325',
+        kind: 'music'
+      },
+      {
+        label: 'Roscoe Family Dinner on Amazon Music',
+        shortLabel: 'AMAZON MUSIC',
+        href: 'https://music.amazon.com/albums/B0GYTBMMC3',
+        kind: 'music'
+      },
+      {
+        label: 'Roscoe Family Dinner on Tidal',
+        shortLabel: 'TIDAL',
+        href: 'https://listen.tidal.com/album/519887831',
+        kind: 'music'
+      },
+      {
+        label: 'Roscoe Family Dinner on Spotify',
+        shortLabel: 'SPOTIFY',
+        href: 'https://open.spotify.com/album/26cFULKOTIr6OH1jlIYNBQ?si=PVRqDvgaRBKYwY87cYGa0Q',
+        kind: 'music'
+      }
+    ]
+  },
+  {
+    title: 'move soft',
+    artwork: moveSoftArtwork,
+    artworkAlt: 'move soft release artwork showing a painted bedroom scene',
+    titleClassName: 'text-black',
+    linkClassName: 'text-release-purple',
+    links: [
+      {
+        label: 'move soft on YouTube Music',
+        shortLabel: 'YT MUSIC',
+        href: 'https://music.youtube.com/playlist?list=OLAK5uy_n6k_Y8IhQnYUfKp4lJEtX7hC8t6uCzRdo&si=bTAtSvTPJd8gwb46',
+        kind: 'music'
+      },
+      {
+        label: 'move soft on Apple Music',
+        shortLabel: 'APPLE MUSIC',
+        href: 'https://music.apple.com/us/album/move-soft/1892896845',
+        kind: 'music'
+      },
+      {
+        label: 'move soft on Amazon Music',
+        shortLabel: 'AMAZON MUSIC',
+        href: 'https://music.amazon.com/albums/B0GWYDS36J',
+        kind: 'music'
+      },
+      {
+        label: 'move soft on Bandcamp',
+        shortLabel: 'BANDCAMP',
+        href: 'https://junahblue.bandcamp.com/album/roscoe-family-dinner',
+        kind: 'music'
+      },
+      {
+        label: 'move soft on Tidal',
+        shortLabel: 'TIDAL',
+        href: 'https://listen.tidal.com/album/515359030',
+        kind: 'music'
+      },
+      {
+        label: 'move soft on Spotify',
+        shortLabel: 'SPOTIFY',
+        href: 'https://open.spotify.com/album/6wwHDs7uhnnmkn2vE4dCjl?si=J4e89YVmTCmA9U-GDFmR3Q',
+        kind: 'music'
+      }
+    ]
   }
 ];
 

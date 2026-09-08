@@ -121,6 +121,12 @@ export const musicReleases: MusicRelease[] = [
         kind: 'music'
       },
       {
+        label: 'Roscoe Family Dinner on Bandcamp',
+        shortLabel: 'BANDCAMP',
+        href: 'https://junahblue.bandcamp.com/album/roscoe-family-dinner',
+        kind: 'music'
+      },
+      {
         label: 'Roscoe Family Dinner on Tidal',
         shortLabel: 'TIDAL',
         href: 'https://listen.tidal.com/album/519887831',
@@ -157,12 +163,6 @@ export const musicReleases: MusicRelease[] = [
         label: 'move soft on Amazon Music',
         shortLabel: 'AMAZON MUSIC',
         href: 'https://music.amazon.com/albums/B0GWYDS36J',
-        kind: 'music'
-      },
-      {
-        label: 'move soft on Bandcamp',
-        shortLabel: 'BANDCAMP',
-        href: 'https://junahblue.bandcamp.com/album/roscoe-family-dinner',
         kind: 'music'
       },
       {

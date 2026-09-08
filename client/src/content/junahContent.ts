@@ -28,7 +28,7 @@ export interface MusicRelease {
 }
 
 export const homeBio =
-  'Junah is a singer/songwriter based in Los Angeles. He mixes creative poetry with a masterful skill of melody to bring a refreshing and modern spin on R&B and Pop music.';
+  'Junah is a singer/songwriter based in Los Angeles. He mixes creative poetry with a masterful skill of melody to bring a refreshing and modern spin to R&B and Pop music.';
 
 export const aboutFacts = [
   { label: 'Who', value: 'Junah (aka Junah Blue)' },

@@ -395,11 +395,10 @@ export const ApparelPage: React.FC = () => {
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-10 md:px-6">
-      <SectionHeader
-        title="APPAREL"
-        description="Browse Junah merch."
-        titleClassName="text-apparel-red"
-      />
+      <h1 className="text-5xl font-bold text-apparel-red md:text-7xl">APPAREL</h1>
+      <p className="mt-3 text-xl font-semibold text-apparel-red md:text-2xl">
+        Browse Junah merch.
+      </p>
 
       {error ? <p className="rounded border border-red-300 bg-red-50 p-3 text-red-700">{error}</p> : null}
 

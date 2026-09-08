@@ -13,6 +13,7 @@ export const usePathRouter = () => {
     if (nextPath === path) return;
     window.history.pushState({}, '', nextPath);
     setPath(nextPath);
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [path]);
 
   const replace = useCallback((nextPath: string) => {

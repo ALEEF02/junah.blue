@@ -68,6 +68,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             AM I REAL ENOUGH YET?<br />
             or will i be drowned in the noise?
           </p>
+          <PlatformLinks
+            iconOnly
+            className="mt-6 justify-center"
+            linkClassName="text-black"
+            onLinkClick={(event) => event.stopPropagation()}
+          />
           <div className="mt-8 aspect-video w-full max-w-2xl overflow-hidden bg-black">
             <iframe
               className="h-full w-full"
